@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Reproduce the eval. Supply your key via the environment (never paste it into a
+# committed file): `export ANTHROPIC_API_KEY=...` then run this script.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+: "${ANTHROPIC_API_KEY:?Set ANTHROPIC_API_KEY before running}"
+
+# --- critique eval (the deliverable) -------------------------------------
+python3 eval.py merge                                                 # base + overrides -> v2 items
+python3 eval.py generate --models haiku sonnet opus fable --samples 3 # -> eval_transcripts.jsonl
+python3 eval.py grade    --grader opus                                # -> eval_grades.jsonl
+python3 eval.py summarize                                             # -> eval_results.{json,md}
+python3 analysis.py                                                   # -> eval_failure_analysis.md, figures
+python3 calibrate.py                                                  # grader calibration -> calibration_report.md
+
+# --- concept-critique exploration harness (Part 0/1) ---------------------
+# python3 runner.py -i questions.jsonl -o transcripts.jsonl -n 3 -c 4

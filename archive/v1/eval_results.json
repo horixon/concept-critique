@@ -1,0 +1,250 @@
+{
+  "grader_model": "opus",
+  "n_items": 11,
+  "n_grades": 132,
+  "generation_failures": 0,
+  "grading_failures": 0,
+  "generation_failure_keys": [],
+  "model_stats": {
+    "haiku": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.603030303030303,
+      "ci95": [
+        0.465909090909091,
+        0.7492424242424243
+      ],
+      "items_covered": 11,
+      "std": 0.29418335705232346,
+      "response_pooled_mean": 0.6030303030303032
+    },
+    "sonnet": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.8515151515151516,
+      "ci95": [
+        0.7356060606060608,
+        0.9537878787878789
+      ],
+      "items_covered": 11,
+      "std": 0.23564381457230987,
+      "response_pooled_mean": 0.8515151515151514
+    },
+    "opus": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.9015151515151515,
+      "ci95": [
+        0.8098484848484848,
+        0.9833333333333333
+      ],
+      "items_covered": 11,
+      "std": 0.19645912848318092,
+      "response_pooled_mean": 0.9015151515151515
+    },
+    "fable": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.984090909090909,
+      "ci95": [
+        0.952272727272727,
+        1.0
+      ],
+      "items_covered": 11,
+      "std": 0.050308962775406044,
+      "response_pooled_mean": 0.9840909090909091
+    }
+  },
+  "dimension_means": {
+    "haiku": {
+      "centrality": 0.5909090909090909,
+      "argument_fidelity": 0.7272727272727273,
+      "novelty": 0.6818181818181818,
+      "justified_impact": 0.696969696969697
+    },
+    "sonnet": {
+      "centrality": 0.8181818181818182,
+      "argument_fidelity": 0.9393939393939394,
+      "novelty": 0.8939393939393939,
+      "justified_impact": 0.9090909090909091
+    },
+    "opus": {
+      "centrality": 0.8636363636363636,
+      "argument_fidelity": 0.9545454545454546,
+      "novelty": 0.9242424242424242,
+      "justified_impact": 0.9242424242424242
+    },
+    "fable": {
+      "centrality": 0.9545454545454546,
+      "argument_fidelity": 1.0,
+      "novelty": 1.0,
+      "justified_impact": 1.0
+    }
+  },
+  "penalty_rates": {
+    "haiku": {
+      "laundry_list": 0.030303030303030304,
+      "overclaim": 0.5454545454545454,
+      "mere_operationalization": 0.030303030303030304,
+      "retreat_as_repair": 0.030303030303030304,
+      "unsupported_claim": 0.0
+    },
+    "sonnet": {
+      "laundry_list": 0.0,
+      "overclaim": 0.2727272727272727,
+      "mere_operationalization": 0.030303030303030304,
+      "retreat_as_repair": 0.0,
+      "unsupported_claim": 0.0
+    },
+    "opus": {
+      "laundry_list": 0.0,
+      "overclaim": 0.09090909090909091,
+      "mere_operationalization": 0.0,
+      "retreat_as_repair": 0.0,
+      "unsupported_claim": 0.0
+    },
+    "fable": {
+      "laundry_list": 0.0,
+      "overclaim": 0.0,
+      "mere_operationalization": 0.0,
+      "retreat_as_repair": 0.0,
+      "unsupported_claim": 0.0
+    }
+  },
+  "robust_vs_flaw": {
+    "haiku": {
+      "robust_control_mean": 0.5402777777777777,
+      "flaw_mean": 0.6783333333333335
+    },
+    "sonnet": {
+      "robust_control_mean": 0.8638888888888889,
+      "flaw_mean": 0.8366666666666666
+    },
+    "opus": {
+      "robust_control_mean": 0.9513888888888888,
+      "flaw_mean": 0.8416666666666667
+    },
+    "fable": {
+      "robust_control_mean": 1.0,
+      "flaw_mean": 0.9649999999999999
+    }
+  },
+  "robust_control_item_ids": [
+    1,
+    2,
+    3,
+    5,
+    8,
+    9
+  ],
+  "flaw_item_ids": [
+    0,
+    4,
+    6,
+    7,
+    10
+  ],
+  "equal_weight_means": {
+    "haiku": 0.6128787878787878,
+    "sonnet": 0.8598484848484848,
+    "opus": 0.9075757575757575,
+    "fable": 0.9886363636363636
+  },
+  "ordering_main": [
+    "fable",
+    "opus",
+    "sonnet",
+    "haiku"
+  ],
+  "ordering_equal_weight": [
+    "fable",
+    "opus",
+    "sonnet",
+    "haiku"
+  ],
+  "ordering_changes_under_equal_weight": false,
+  "length_score_correlation": 0.1297498155703661,
+  "expected_capability_ordering_opus_sonnet_haiku": true,
+  "item_scores": {
+    "0": {
+      "n": 12,
+      "mean": 1.0,
+      "robust_control": false,
+      "case_type": "deliberate_internal_contradiction"
+    },
+    "1": {
+      "n": 12,
+      "mean": 0.6708333333333334,
+      "robust_control": true,
+      "case_type": "underspecified_but_coherent_control"
+    },
+    "2": {
+      "n": 12,
+      "mean": 0.8416666666666667,
+      "robust_control": true,
+      "case_type": "implementation_demand_trap"
+    },
+    "3": {
+      "n": 12,
+      "mean": 0.9166666666666666,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "4": {
+      "n": 12,
+      "mean": 0.6208333333333333,
+      "robust_control": false,
+      "case_type": "subtle_construct_equivocation"
+    },
+    "5": {
+      "n": 12,
+      "mean": 0.7416666666666667,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "6": {
+      "n": 12,
+      "mean": 0.9562500000000002,
+      "robust_control": false,
+      "case_type": "strong_argument_with_epistemic_limit"
+    },
+    "7": {
+      "n": 12,
+      "mean": 0.75,
+      "robust_control": false,
+      "case_type": "subtle_decision_theory_gap"
+    },
+    "8": {
+      "n": 12,
+      "mean": 0.9041666666666667,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "9": {
+      "n": 12,
+      "mean": 0.9583333333333334,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "10": {
+      "n": 12,
+      "mean": 0.8250000000000001,
+      "robust_control": false,
+      "case_type": "internal_accounting_tension"
+    }
+  },
+  "sample_scores": {
+    "0": {
+      "n": 44,
+      "mean": 0.8397727272727272
+    },
+    "1": {
+      "n": 44,
+      "mean": 0.8386363636363634
+    },
+    "2": {
+      "n": 44,
+      "mean": 0.8267045454545454
+    }
+  }
+}

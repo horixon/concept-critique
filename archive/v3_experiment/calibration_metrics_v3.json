@@ -1,0 +1,149 @@
+{
+  "grader_model": "opus",
+  "n_graded": 18,
+  "dimension": {
+    "centrality": {
+      "exact": 0.3333333333333333,
+      "within_0.25": 0.8333333333333334,
+      "mae": 0.2222222222222222
+    },
+    "argument_fidelity": {
+      "exact": 0.6666666666666666,
+      "within_0.25": 1.0,
+      "mae": 0.08333333333333333
+    },
+    "novelty": {
+      "exact": 0.3333333333333333,
+      "within_0.25": 0.8333333333333334,
+      "mae": 0.2222222222222222
+    },
+    "justified_impact": {
+      "exact": 0.4444444444444444,
+      "within_0.25": 0.9444444444444444,
+      "mae": 0.1527777777777778
+    }
+  },
+  "dimension_within_0.25_macro": 0.9027777777777779,
+  "penalty_overall": {
+    "tp": 22,
+    "fp": 5,
+    "fn": 7,
+    "precision": 0.8148148148148148,
+    "recall": 0.7586206896551724
+  },
+  "penalty_by_type": {
+    "laundry_list": {
+      "tp": 12,
+      "fp": 0,
+      "fn": 5,
+      "precision": 1.0,
+      "recall": 0.7058823529411765
+    },
+    "overclaim": {
+      "tp": 6,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0.6,
+      "recall": 1.0
+    },
+    "mere_operationalization": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.8,
+      "recall": 1.0
+    },
+    "retreat_as_repair": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": null,
+      "recall": 0.0
+    },
+    "unsupported_claim": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": null,
+      "recall": 0.0
+    }
+  },
+  "disposition_accuracy": 0.8333333333333334,
+  "spearman": 0.6799178058825778,
+  "pearson": 0.6502683911259068,
+  "item_score_mae": 0.21249999999999997,
+  "pairwise_ordering_accuracy": 0.7482517482517482,
+  "pairwise_counts": {
+    "concordant": 103,
+    "discordant": 32,
+    "ties": 8
+  },
+  "polished_novelty": {
+    "passed": 0,
+    "total": 2
+  },
+  "mere_operationalization_recall": 0.8,
+  "overclaim_recall": 0.6666666666666666,
+  "argument_specific_over_weak": {
+    "pairs": 20,
+    "ok": 14
+  },
+  "gates": {
+    "pairwise_ordering>=0.745": {
+      "value": 0.7482517482517482,
+      "pass": true
+    },
+    "spearman>=0.70": {
+      "value": 0.6799178058825778,
+      "pass": false
+    },
+    "disposition_accuracy>=0.80": {
+      "value": 0.8333333333333334,
+      "pass": true
+    },
+    "polished_novelty_check>=1/2": {
+      "value": "0/2",
+      "pass": false
+    },
+    "mere_operationalization_recall>=0.75": {
+      "value": 0.8,
+      "pass": true
+    },
+    "overclaim_recall>=2/3": {
+      "value": 0.6666666666666666,
+      "pass": true
+    },
+    "argument_fidelity_within_0.25>=0.90": {
+      "value": 1.0,
+      "pass": true
+    }
+  },
+  "all_gates_pass": false,
+  "anchors": {
+    "q1_opus_verification_high": {
+      "cal": 7,
+      "score": 0.8125,
+      "pass": true
+    },
+    "q1_fable_strong_high": {
+      "cal": 8,
+      "score": 0.95,
+      "pass": true
+    },
+    "q0_fable_polished_below_both": {
+      "cal": 4,
+      "score": 0.7875,
+      "pass": false
+    },
+    "q1_haiku_unfalsifiable_overclaim": {
+      "cal": 9,
+      "score": 0.1,
+      "pass": true
+    },
+    "q0_haiku_threshold_operationalization": {
+      "cal": 0,
+      "score": 0.1,
+      "pass": true
+    }
+  }
+}

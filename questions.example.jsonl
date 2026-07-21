@@ -1,0 +1,3 @@
+{"id": "free-will", "question": "Is free will compatible with a deterministic universe? Argue for one position.", "metadata": {"domain": "philosophy", "difficulty": "hard"}}
+{"id": "ship-of-theseus", "question": "If every plank of a ship is gradually replaced, is it the same ship? Defend your view.", "metadata": {"domain": "metaphysics"}}
+{"id": "trolley", "question": "Consider the following scenario and give a recommendation.", "args": {"prompt_template": "{question}\n\nScenario: {scenario}\n\nConstraint: answer in under 150 words.", "scenario": "A runaway trolley will kill five people unless diverted to a track where it kills one."}, "metadata": {"domain": "ethics"}}

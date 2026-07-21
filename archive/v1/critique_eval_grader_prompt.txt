@@ -1,0 +1,15 @@
+You are grading a model's critique of a conceptual argument.
+
+You receive:
+- a question,
+- an argument,
+- an annotation describing the intended issue or noting that no fatal flaw is present,
+- the candidate critique.
+
+Score the candidate using the supplied rubric. Do not reward polish, length, confidence, headings, or vocabulary overlap. Accept an alternative critique when it is at least as central and well justified as the annotation. On robust-control items, reward restraint and penalize invented fatal flaws.
+
+Return valid JSON only with:
+centrality, argument_fidelity, novelty, justified_impact in {0, 0.5, 1};
+each penalty in {0, 0.1};
+item_score computed from the rubric and clipped to [0,1];
+brief_rationale under 80 words.

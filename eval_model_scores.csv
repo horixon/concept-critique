@@ -1,0 +1,5 @@
+Model,Overall_item_mean,ci95_lo,ci95_hi,items_covered,successful_generations,Centrality,Fidelity,Novelty,Impact,Control score,False attack rate,Mean words,word_limit_violation_rate
+Haiku 4.5,0.583,0.478,0.697,11,33,0.553,0.689,0.652,0.674,0.52,22.2%,303,48.5%
+Sonnet 4.6,0.716,0.614,0.816,11,33,0.674,0.833,0.758,0.765,0.656,11.1%,293,12.1%
+Opus 4.8,0.816,0.738,0.897,11,33,0.773,0.871,0.856,0.826,0.797,5.6%,305,84.8%
+Fable 5,0.829,0.75,0.908,11,33,0.78,0.902,0.856,0.841,0.811,5.6%,304,75.8%

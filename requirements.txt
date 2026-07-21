@@ -1,0 +1,7 @@
+anthropic>=0.40
+reportlab>=4.0
+matplotlib>=3.7
+
+# writeup/ figure tooling only (not needed to run the eval)
+PyMuPDF>=1.24
+Pillow>=10.0

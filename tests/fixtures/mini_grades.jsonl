@@ -1,0 +1,5 @@
+{"eval_id": 0, "candidate_model_alias": "haiku", "sample_number": 0, "item_score": 1.0, "error": null}
+{"eval_id": 0, "candidate_model_alias": "haiku", "sample_number": 1, "item_score": 0.0, "error": null}
+{"eval_id": 1, "candidate_model_alias": "haiku", "sample_number": 0, "item_score": null, "error": {"type": "APIStatusError"}}
+{"eval_id": 1, "candidate_model_alias": "haiku", "sample_number": 0, "item_score": 1.0, "error": null}
+{"eval_id": 0, "candidate_model_alias": "sonnet", "sample_number": 0, "item_score": 0.5, "error": null}

@@ -1,0 +1,281 @@
+{
+  "grader_model": "opus",
+  "n_items": 11,
+  "n_grades": 132,
+  "generation_failures": 0,
+  "grading_failures": 0,
+  "generation_failure_keys": [],
+  "model_stats": {
+    "haiku": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.5825757575757575,
+      "ci95": [
+        0.47840909090909095,
+        0.6969696969696969
+      ],
+      "items_covered": 11,
+      "std": 0.2108770330042333,
+      "response_pooled_mean": 0.5825757575757576
+    },
+    "sonnet": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.7155303030303032,
+      "ci95": [
+        0.6143939393939394,
+        0.8159090909090909
+      ],
+      "items_covered": 11,
+      "std": 0.18655139593192702,
+      "response_pooled_mean": 0.715530303030303
+    },
+    "opus": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.8155303030303032,
+      "ci95": [
+        0.7382575757575758,
+        0.8965909090909091
+      ],
+      "items_covered": 11,
+      "std": 0.15041074769151402,
+      "response_pooled_mean": 0.8155303030303029
+    },
+    "fable": {
+      "n": 33,
+      "successful_generations": 33,
+      "mean": 0.8287878787878789,
+      "ci95": [
+        0.7496212121212121,
+        0.9083333333333333
+      ],
+      "items_covered": 11,
+      "std": 0.15214641225532438,
+      "response_pooled_mean": 0.8287878787878789
+    }
+  },
+  "dimension_means": {
+    "haiku": {
+      "centrality": 0.553030303030303,
+      "argument_fidelity": 0.6893939393939394,
+      "novelty": 0.6515151515151515,
+      "justified_impact": 0.6742424242424242
+    },
+    "sonnet": {
+      "centrality": 0.6742424242424242,
+      "argument_fidelity": 0.8333333333333334,
+      "novelty": 0.7575757575757576,
+      "justified_impact": 0.7651515151515151
+    },
+    "opus": {
+      "centrality": 0.7727272727272727,
+      "argument_fidelity": 0.8712121212121212,
+      "novelty": 0.8560606060606061,
+      "justified_impact": 0.8257575757575758
+    },
+    "fable": {
+      "centrality": 0.7803030303030303,
+      "argument_fidelity": 0.9015151515151515,
+      "novelty": 0.8560606060606061,
+      "justified_impact": 0.8409090909090909
+    }
+  },
+  "penalty_rates": {
+    "haiku": {
+      "laundry_list": 0.12121212121212122,
+      "overclaim": 0.12121212121212122,
+      "mere_operationalization": 0.030303030303030304,
+      "retreat_as_repair": 0.030303030303030304,
+      "unsupported_claim": 0.0
+    },
+    "sonnet": {
+      "laundry_list": 0.09090909090909091,
+      "overclaim": 0.06060606060606061,
+      "mere_operationalization": 0.030303030303030304,
+      "retreat_as_repair": 0.0,
+      "unsupported_claim": 0.0
+    },
+    "opus": {
+      "laundry_list": 0.030303030303030304,
+      "overclaim": 0.030303030303030304,
+      "mere_operationalization": 0.0,
+      "retreat_as_repair": 0.0,
+      "unsupported_claim": 0.0
+    },
+    "fable": {
+      "laundry_list": 0.0,
+      "overclaim": 0.09090909090909091,
+      "mere_operationalization": 0.0,
+      "retreat_as_repair": 0.0,
+      "unsupported_claim": 0.0
+    }
+  },
+  "robust_vs_flaw": {
+    "haiku": {
+      "robust_control_mean": 0.5201388888888889,
+      "flaw_mean": 0.6575000000000001
+    },
+    "sonnet": {
+      "robust_control_mean": 0.6555555555555554,
+      "flaw_mean": 0.7874999999999999
+    },
+    "opus": {
+      "robust_control_mean": 0.7972222222222223,
+      "flaw_mean": 0.8375
+    },
+    "fable": {
+      "robust_control_mean": 0.8111111111111111,
+      "flaw_mean": 0.85
+    }
+  },
+  "robust_control_item_ids": [
+    1,
+    2,
+    3,
+    5,
+    8,
+    9
+  ],
+  "flaw_item_ids": [
+    0,
+    4,
+    6,
+    7,
+    10
+  ],
+  "equal_weight_means": {
+    "haiku": 0.5890151515151515,
+    "sonnet": 0.7204545454545455,
+    "opus": 0.8215909090909091,
+    "fable": 0.8356060606060605
+  },
+  "ordering_main": [
+    "fable",
+    "opus",
+    "sonnet",
+    "haiku"
+  ],
+  "ordering_equal_weight": [
+    "fable",
+    "opus",
+    "sonnet",
+    "haiku"
+  ],
+  "ordering_changes_under_equal_weight": false,
+  "length_score_correlation": 0.10240613768302922,
+  "word_limit": 300,
+  "word_limit_compliance": {
+    "haiku": {
+      "n": 33,
+      "violations": 16,
+      "violation_rate": 0.48484848484848486,
+      "mean_words": 302.969696969697,
+      "max_words": 329
+    },
+    "sonnet": {
+      "n": 33,
+      "violations": 4,
+      "violation_rate": 0.12121212121212122,
+      "mean_words": 293.06060606060606,
+      "max_words": 312
+    },
+    "opus": {
+      "n": 33,
+      "violations": 28,
+      "violation_rate": 0.8484848484848485,
+      "mean_words": 304.8787878787879,
+      "max_words": 320
+    },
+    "fable": {
+      "n": 33,
+      "violations": 25,
+      "violation_rate": 0.7575757575757576,
+      "mean_words": 304.2121212121212,
+      "max_words": 325
+    }
+  },
+  "expected_capability_ordering_opus_sonnet_haiku": true,
+  "item_scores": {
+    "0": {
+      "n": 12,
+      "mean": 0.9864583333333333,
+      "robust_control": false,
+      "case_type": "deliberate_internal_contradiction"
+    },
+    "1": {
+      "n": 12,
+      "mean": 0.5624999999999999,
+      "robust_control": true,
+      "case_type": "underspecified_but_coherent_control"
+    },
+    "2": {
+      "n": 12,
+      "mean": 0.734375,
+      "robust_control": true,
+      "case_type": "implementation_demand_trap"
+    },
+    "3": {
+      "n": 12,
+      "mean": 0.6760416666666668,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "4": {
+      "n": 12,
+      "mean": 0.5864583333333332,
+      "robust_control": false,
+      "case_type": "subtle_construct_equivocation"
+    },
+    "5": {
+      "n": 12,
+      "mean": 0.7072916666666668,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "6": {
+      "n": 12,
+      "mean": 0.928125,
+      "robust_control": false,
+      "case_type": "strong_argument_with_epistemic_limit"
+    },
+    "7": {
+      "n": 12,
+      "mean": 0.6260416666666666,
+      "robust_control": false,
+      "case_type": "subtle_decision_theory_gap"
+    },
+    "8": {
+      "n": 12,
+      "mean": 0.7104166666666667,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "9": {
+      "n": 12,
+      "mean": 0.7854166666666668,
+      "robust_control": true,
+      "case_type": "strong_qualified_argument"
+    },
+    "10": {
+      "n": 12,
+      "mean": 0.7885416666666667,
+      "robust_control": false,
+      "case_type": "internal_accounting_tension"
+    }
+  },
+  "sample_scores": {
+    "0": {
+      "n": 44,
+      "mean": 0.725
+    },
+    "1": {
+      "n": 44,
+      "mean": 0.734659090909091
+    },
+    "2": {
+      "n": 44,
+      "mean": 0.7471590909090906
+    }
+  }
+}

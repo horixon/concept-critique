@@ -1,0 +1,153 @@
+{
+  "grader_model": "opus",
+  "n_records": 18,
+  "n_graded": 18,
+  "missing": [],
+  "dimension_agreement": {
+    "centrality": {
+      "exact": 0.2222222222222222,
+      "within_0.25": 0.7777777777777778,
+      "mae": 0.2638888888888889
+    },
+    "argument_fidelity": {
+      "exact": 0.5,
+      "within_0.25": 1.0,
+      "mae": 0.125
+    },
+    "novelty": {
+      "exact": 0.3333333333333333,
+      "within_0.25": 0.7777777777777778,
+      "mae": 0.2361111111111111
+    },
+    "justified_impact": {
+      "exact": 0.3333333333333333,
+      "within_0.25": 0.9444444444444444,
+      "mae": 0.18055555555555555
+    }
+  },
+  "dimension_exact_macro": 0.3472222222222222,
+  "dimension_within_0.25_macro": 0.875,
+  "penalty_overall": {
+    "tp": 20,
+    "fp": 1,
+    "fn": 9,
+    "precision": 0.9523809523809523,
+    "recall": 0.6896551724137931
+  },
+  "penalty_by_type": {
+    "laundry_list": {
+      "tp": 17,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.9444444444444444,
+      "recall": 1.0
+    },
+    "overclaim": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 5,
+      "precision": 1.0,
+      "recall": 0.16666666666666666
+    },
+    "mere_operationalization": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    "retreat_as_repair": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": null,
+      "recall": 0.0
+    },
+    "unsupported_claim": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": null,
+      "recall": 0.0
+    }
+  },
+  "disposition_accuracy": 0.8333333333333334,
+  "item_score_spearman": 0.7387438604994726,
+  "item_score_pearson": 0.6977522507024704,
+  "item_score_mae": 0.21944444444444444,
+  "pairwise_ordering_accuracy": 0.7867132867132867,
+  "pairwise_counts": {
+    "concordant": 108,
+    "discordant": 26,
+    "grader_ties": 9
+  },
+  "argument_specific_vs_laundry": {
+    "pairs": 20,
+    "grader_ranks_strong_higher": 12,
+    "human_ranks_strong_higher": 19
+  },
+  "checks": [
+    {
+      "name": "Polished restatement -> novelty in {0, 0.25}",
+      "n": 2,
+      "grader_passed": 0,
+      "human_passed": 1,
+      "members": [
+        2,
+        4
+      ],
+      "grader_failures": [
+        2,
+        4
+      ],
+      "detail": "novelty should be <= 0.25"
+    },
+    {
+      "name": "Operational substitution -> mere_operationalization penalty",
+      "n": 5,
+      "grader_passed": 2,
+      "human_passed": 4,
+      "members": [
+        0,
+        10,
+        12,
+        13,
+        16
+      ],
+      "grader_failures": [
+        0,
+        10,
+        13
+      ],
+      "detail": "should apply mere_operationalization"
+    },
+    {
+      "name": "Overclaiming -> overclaim penalty",
+      "n": 3,
+      "grader_passed": 1,
+      "human_passed": 2,
+      "members": [
+        0,
+        9,
+        17
+      ],
+      "grader_failures": [
+        0,
+        17
+      ],
+      "detail": "should apply overclaim"
+    },
+    {
+      "name": "Scope correction -> disposition 'narrows' (not 'defeats')",
+      "n": 1,
+      "grader_passed": 1,
+      "human_passed": 1,
+      "members": [
+        8
+      ],
+      "grader_failures": [],
+      "detail": "disposition should be narrows"
+    }
+  ],
+  "note_no_tuning": "The grader prompt was not modified during calibration; metrics are over all 18 records. No repeated tuning on the set occurred, so no holdout was required."
+}

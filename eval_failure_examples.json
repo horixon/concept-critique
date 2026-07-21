@@ -1,0 +1,269 @@
+{
+  "examples": [
+    {
+      "category": "best_high_scoring",
+      "eval_id": 0,
+      "source_id": 1000,
+      "model_alias": "sonnet",
+      "sample_number": 1,
+      "item_score": 1.0,
+      "grader_reported": null,
+      "dims": {
+        "centrality": 1.0,
+        "argument_fidelity": 1.0,
+        "novelty": 1.0,
+        "justified_impact": 1.0
+      },
+      "penalties": {},
+      "word_count": 282,
+      "is_control": false,
+      "case_type": "deliberate_internal_contradiction",
+      "response_excerpt": "## Core Critique The argument contains a fundamental internal contradiction that undermines its conclusion. The argument simultaneously requires two incompatible things: that preservation be \"historically faithful\" and reflect \"reasoning that actually shaped the decision,\" while also accepting that reconstructing *stated justifications* counts as preserved reasoning even when actual decision-makers acted for \"political, personal, or accidental reasons\" disconnected from that rationale. These can…",
+      "grader_rationale": "The candidate precisely identifies the central internal contradiction: the fidelity requirement versus accepting justification disconnected from actual causes. It explains the final paragraph abandons the earlier criterion and states the argument must choose between causal-history preservation and justificatory reconstruction, satisfying all minimum full-credit elements. It respects concessions, distinguishes narrows from defeats, and connects the flaw to the conclusion via misattributed lessons. This is the gold central issue, not a restatement of concessions.",
+      "manual_note": "Highest-scoring critique on a genuine-flaw item with full centrality; identifies the annotated central issue and shows its effect on the conclusion rather than only restating the argument."
+    },
+    {
+      "category": "operational_substitution",
+      "eval_id": 2,
+      "source_id": 1002,
+      "model_alias": "haiku",
+      "sample_number": 1,
+      "item_score": 0.212,
+      "grader_reported": null,
+      "dims": {
+        "centrality": 0.25,
+        "argument_fidelity": 0.5,
+        "novelty": 0.5,
+        "justified_impact": 0.5
+      },
+      "penalties": {
+        "overclaim": 0.1,
+        "mere_operationalization": 0.1
+      },
+      "word_count": 285,
+      "is_control": true,
+      "case_type": "implementation_demand_trap",
+      "response_excerpt": "# Critique: The Circularity Problem The argument's core weakness is circularity in defining \"preservation.\" It claims organizations preserve reasoning by retaining evidence that enables later reconstruction, then measures preservation success by whether reconstructions are credible. But this makes preservation parasitic on reconstruction quality—a quality the argument explicitly declines to specify. This matters because the argument faces a fundamental dilemma: **If reconstruction quality is mea…",
+      "grader_rationale": "This is a robust control where the argument explicitly disclaims procedural specification. The candidate frames non-specification as a fatal circularity/vacuity flaw, essentially demanding the very implementation thresholds ('what counts as contemporaneous,' 'how explicit') the argument concedes are out of scope. It fails the full-credit requirement of recognizing no fatal flaw. The best available angle—epistemic sufficiency of contemporaneous evidence (performativity, contested fact/inference separation)—is gestured at but not developed. Inventing vacuity on a control caps centrality at 0.25. Overclaim and operationalization-demand penalties apply.",
+      "manual_note": "Grader applied the mere_operationalization penalty: demands thresholds/procedures/detail without showing the omission defeats the conceptual claim."
+    },
+    {
+      "category": "robust_control_false_positive",
+      "eval_id": 1,
+      "source_id": 1001,
+      "model_alias": "haiku",
+      "sample_number": 1,
+      "item_score": 0.212,
+      "grader_reported": null,
+      "dims": {
+        "centrality": 0.25,
+        "argument_fidelity": 0.5,
+        "novelty": 0.0,
+        "justified_impact": 0.5
+      },
+      "penalties": {
+        "overclaim": 0.1
+      },
+      "word_count": 273,
+      "is_control": true,
+      "case_type": "underspecified_but_coherent_control",
+      "response_excerpt": "# Critique: The Circularity Problem The argument's core weakness is **circular reasoning about the adequacy standard**. It claims preservation should be judged by whether records support \"sufficiently reliable reconstruction,\" but then immediately concedes that \"sufficiently\" is context-dependent—varying by purpose, stakes, and cost of error. This makes the initial definition vacuous: we cannot know what counts as preserving reasoning until we know the downstream purpose, yet preservation is sup…",
+      "grader_rationale": "This is a robust control that explicitly concedes purpose-relativity and denies a universal threshold. The candidate invents a fatal circularity/vacuity flaw—exactly the tempting-but-weak move—treating context dependence as a defect rather than the argument's stated design. It also embeds preservation-as-degree the argument already concedes. Novelty is 0 (attacks an acknowledged concession); centrality capped at 0.25 for inventing a flaw on a control. Fidelity suffers by treating a graded standard as claiming an objective/intrinsic property. Overclaim penalty for asserting the definition 'dissolves.'",
+      "manual_note": "Robust-control item (qualify_no_fatal_flaw); the grader flagged an unearned fatal-flaw claim (overclaim) matching the item's tempting-but-weak list. The candidate over-attacked a broadly coherent argument instead of offering a bounded qualification."
+    }
+  ],
+  "aggregate": {
+    "validation": {
+      "expected_candidates": 132,
+      "candidate_rows": 132,
+      "unique_candidates": 132,
+      "successful_candidates": 132,
+      "failed_candidate_keys": [],
+      "grade_rows": 132,
+      "successful_grades": 132,
+      "grading_failures": 0,
+      "missing_candidates": [],
+      "duplicate_candidate_keys": 0,
+      "duplicate_grade_keys": 0,
+      "unexpected_model_ids": [],
+      "incomplete_sample_counts": {}
+    },
+    "per_model": {
+      "haiku": {
+        "n": 33,
+        "items_covered": 11,
+        "mean": 0.5825757575757575,
+        "std": 0.2108770330042333,
+        "ci95": [
+          0.47840909090909095,
+          0.6969696969696969
+        ],
+        "response_pooled_mean": 0.5825757575757576,
+        "equal_weight_mean": 0.5890151515151515,
+        "centrality": 0.553030303030303,
+        "argument_fidelity": 0.6893939393939394,
+        "novelty": 0.6515151515151515,
+        "justified_impact": 0.6742424242424242,
+        "mean_penalty": 0.0303030303030303,
+        "penalty_rates": {
+          "laundry_list": 0.12121212121212122,
+          "overclaim": 0.12121212121212122,
+          "mere_operationalization": 0.030303030303030304,
+          "retreat_as_repair": 0.030303030303030304,
+          "unsupported_claim": 0.0
+        },
+        "mean_words": 302.969696969697,
+        "word_limit_violation_rate": 0.48484848484848486,
+        "control_mean": 0.5201388888888889,
+        "flaw_mean": 0.6575000000000001,
+        "control_false_attack_rate": 0.2222222222222222,
+        "control_operationalization_rate": 0.05555555555555555,
+        "candidate_failures": 0,
+        "grading_failures": 0
+      },
+      "sonnet": {
+        "n": 33,
+        "items_covered": 11,
+        "mean": 0.7155303030303032,
+        "std": 0.18655139593192702,
+        "ci95": [
+          0.6143939393939394,
+          0.8159090909090909
+        ],
+        "response_pooled_mean": 0.715530303030303,
+        "equal_weight_mean": 0.7204545454545455,
+        "centrality": 0.6742424242424242,
+        "argument_fidelity": 0.8333333333333334,
+        "novelty": 0.7575757575757576,
+        "justified_impact": 0.7651515151515151,
+        "mean_penalty": 0.01818181818181818,
+        "penalty_rates": {
+          "laundry_list": 0.09090909090909091,
+          "overclaim": 0.06060606060606061,
+          "mere_operationalization": 0.030303030303030304,
+          "retreat_as_repair": 0.0,
+          "unsupported_claim": 0.0
+        },
+        "mean_words": 293.06060606060606,
+        "word_limit_violation_rate": 0.12121212121212122,
+        "control_mean": 0.6555555555555554,
+        "flaw_mean": 0.7874999999999999,
+        "control_false_attack_rate": 0.1111111111111111,
+        "control_operationalization_rate": 0.0,
+        "candidate_failures": 0,
+        "grading_failures": 0
+      },
+      "opus": {
+        "n": 33,
+        "items_covered": 11,
+        "mean": 0.8155303030303032,
+        "std": 0.15041074769151402,
+        "ci95": [
+          0.7382575757575758,
+          0.8965909090909091
+        ],
+        "response_pooled_mean": 0.8155303030303029,
+        "equal_weight_mean": 0.8215909090909091,
+        "centrality": 0.7727272727272727,
+        "argument_fidelity": 0.8712121212121212,
+        "novelty": 0.8560606060606061,
+        "justified_impact": 0.8257575757575758,
+        "mean_penalty": 0.006060606060606061,
+        "penalty_rates": {
+          "laundry_list": 0.030303030303030304,
+          "overclaim": 0.030303030303030304,
+          "mere_operationalization": 0.0,
+          "retreat_as_repair": 0.0,
+          "unsupported_claim": 0.0
+        },
+        "mean_words": 304.8787878787879,
+        "word_limit_violation_rate": 0.8484848484848485,
+        "control_mean": 0.7972222222222223,
+        "flaw_mean": 0.8375,
+        "control_false_attack_rate": 0.05555555555555555,
+        "control_operationalization_rate": 0.0,
+        "candidate_failures": 0,
+        "grading_failures": 0
+      },
+      "fable": {
+        "n": 33,
+        "items_covered": 11,
+        "mean": 0.8287878787878789,
+        "std": 0.15214641225532438,
+        "ci95": [
+          0.7496212121212121,
+          0.9083333333333333
+        ],
+        "response_pooled_mean": 0.8287878787878789,
+        "equal_weight_mean": 0.8356060606060605,
+        "centrality": 0.7803030303030303,
+        "argument_fidelity": 0.9015151515151515,
+        "novelty": 0.8560606060606061,
+        "justified_impact": 0.8409090909090909,
+        "mean_penalty": 0.009090909090909092,
+        "penalty_rates": {
+          "laundry_list": 0.0,
+          "overclaim": 0.09090909090909091,
+          "mere_operationalization": 0.0,
+          "retreat_as_repair": 0.0,
+          "unsupported_claim": 0.0
+        },
+        "mean_words": 304.2121212121212,
+        "word_limit_violation_rate": 0.7575757575757576,
+        "control_mean": 0.8111111111111111,
+        "flaw_mean": 0.85,
+        "control_false_attack_rate": 0.05555555555555555,
+        "control_operationalization_rate": 0.0,
+        "candidate_failures": 0,
+        "grading_failures": 0
+      }
+    },
+    "score_by_item": {
+      "0": 0.9864583333333333,
+      "1": 0.5624999999999999,
+      "2": 0.734375,
+      "3": 0.6760416666666668,
+      "4": 0.5864583333333332,
+      "5": 0.7072916666666668,
+      "6": 0.928125,
+      "7": 0.6260416666666666,
+      "8": 0.7104166666666667,
+      "9": 0.7854166666666668,
+      "10": 0.7885416666666667
+    },
+    "score_by_case_type": {
+      "deliberate_internal_contradiction": 0.9864583333333333,
+      "implementation_demand_trap": 0.734375,
+      "internal_accounting_tension": 0.7885416666666667,
+      "strong_argument_with_epistemic_limit": 0.928125,
+      "strong_qualified_argument": 0.7197916666666666,
+      "subtle_construct_equivocation": 0.5864583333333332,
+      "subtle_decision_theory_gap": 0.6260416666666666,
+      "underspecified_but_coherent_control": 0.5624999999999999
+    },
+    "ordering_by_mean": [
+      "fable",
+      "opus",
+      "sonnet",
+      "haiku"
+    ],
+    "expected_ordering_opus_sonnet_haiku": true,
+    "length": {
+      "pearson_overall": 0.10240613768302922,
+      "spearman_overall": 0.06544319111217109,
+      "pearson_within_model": {
+        "haiku": 0.39427131421496486,
+        "sonnet": -0.12427860636009545,
+        "opus": -0.042478675615182676,
+        "fable": -0.44116381015505196
+      },
+      "mean_words_by_model": {
+        "haiku": 302.969696969697,
+        "sonnet": 293.06060606060606,
+        "opus": 304.8787878787879,
+        "fable": 304.2121212121212
+      }
+    },
+    "grader_model": "opus"
+  }
+}
