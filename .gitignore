@@ -15,6 +15,10 @@ transcripts.jsonl
 !critique_eval_annotation_overrides_v2.jsonl
 !critique_eval_annotated_items_v2.jsonl
 !eval_grades_v2.jsonl
+# art & design exploration set (separate branch, not the main submission)
+!questions.art_design.jsonl
+!art_design_transcripts.jsonl
+!art_design_runs.jsonl
 
 # Python
 __pycache__/
