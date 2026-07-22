@@ -19,6 +19,10 @@ transcripts.jsonl
 !questions.art_design.jsonl
 !art_design_transcripts.jsonl
 !art_design_runs.jsonl
+# art & design graded eval (parallel to the main pipeline)
+!critique_eval_annotated_items_art_design.jsonl
+!art_design_eval_transcripts.jsonl
+!art_design_eval_grades.jsonl
 
 # Python
 __pycache__/
