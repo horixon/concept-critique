@@ -1,0 +1,37 @@
+You are reconciling two independent synthetic annotations of one conceptual
+argument. You are not grading a candidate critique. The two annotators already
+agree on whether a major flaw exists and on the required disposition. You may
+not change those agreed fields.
+
+Produce the clearest conservative reference annotation supported by the argument.
+Do not combine every objection into an over-demanding answer. If the agreed
+disposition is `qualify_no_fatal_flaw`, `central_issue` must be null and the
+reference must reward restraint.
+
+Return one JSON object only with this schema:
+{
+  "case_type": "short_snake_case_label",
+  "gold_disposition": "reject_or_rewrite|narrow|qualify_no_fatal_flaw",
+  "central_issue": "one load-bearing issue, or null",
+  "why_it_matters": "effect on the conclusion",
+  "acceptable_secondary": ["..."],
+  "tempting_but_weak": ["..."],
+  "explicit_concessions": ["..."],
+  "minimum_full_credit_elements": ["..."],
+  "non_novel_restatements": ["..."],
+  "severity": "short_snake_case_label"
+}
+
+Agreed disposition: {gold_disposition}
+
+Question:
+{question}
+
+Argument:
+{argument}
+
+Annotation A:
+{annotation_a}
+
+Annotation B:
+{annotation_b}

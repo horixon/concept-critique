@@ -23,7 +23,7 @@ Expected Opus>Sonnet>Haiku holds: **True**; v2 ordering fable > opus > sonnet > 
 - **Novelty distribution:** v1 {'0.0': 3, '0.5': 27, '1.0': 102}; v2 {'0.0': 1, '0.5': 24, '0.75': 64, '1.0': 43}.
 - **Robust-control false-attack rate:** Haiku 4.5 61%→22%; Sonnet 4.6 28%→11%; Opus 4.8 6%→6%; Fable 5 0%→6%.
 - **Grader arithmetic failures:** v1 33 → v2 0 (v2 grader returns no item_score; nothing to miscompute).
-- **Item-level changes > 0.20:** 40 of 132 graded candidates. Largest drops/gains listed in `eval_results_v2.json`.
+- **Item-level changes > 0.20:** 40 of 132 graded candidates (historical comparison detail is preserved in git history; the active v2 aggregate is `../../eval_results.json`).
 - **Caps fired (v2):** {'novelty_if_acknowledged_only': 12}.
 
 ## What v2 changed and why
@@ -36,5 +36,4 @@ Length–score Pearson (v2): 0.10. Full scores: Haiku 4.5 1, Sonnet 4.6 3, Opus 
 
 ## Interpretation & limitations
 
-Recompute is authoritative; the v2 grader supplies dimensions and flags only. Caps are applied from structured flags (`already_acknowledged`→novelty, `disposition==no_valid_critique`→impact, control+`disposition==defeats`→total); the centrality secondary cap is enforced by the rubric scale at grading time (no dedicated flag). Monotonic ordering does not prove validity. Limitations carried from v1: the grader still sees the human annotation (overlap reward), valid off-annotation critiques may be under-credited, robust controls depend on the human no-fatal-flaw judgment, a single fixed grader may favor its own style, 11 items give large item-level variance, and Haiku's 7/11 coverage limits its comparison.
-
+Recompute is authoritative; the v2 grader supplies dimensions and flags only. Caps are applied from structured flags (`already_acknowledged`→novelty, `disposition==no_valid_critique`→impact, control+`disposition==defeats`→total); the centrality secondary cap is enforced by the rubric scale at grading time (no dedicated flag). Monotonic ordering does not prove validity. Limitations carried from v1: the grader still sees the human annotation (overlap reward), valid off-annotation critiques may be under-credited, robust controls depend on the human no-fatal-flaw judgment, a single fixed grader may favor its own style, and 11 items give large item-level variance. Every model now covers all 11 items.

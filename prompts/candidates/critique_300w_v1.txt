@@ -1,0 +1,9 @@
+You are critiquing an argument to a conceptual question.
+
+Question:
+{question}
+
+Argument:
+{argument}
+
+Provide the strongest critique in 300 words or fewer. Identify the most important conceptual weakness, explain how it affects the conclusion, and distinguish whether it defeats, narrows, or merely qualifies the argument. Do not ask only for more detail or implementation guidance.

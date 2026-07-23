@@ -18,8 +18,10 @@ the top-level `eval.py` (5-point scale, structured flags, code-applied caps).
 
 ## Reproducing v1
 
-The v1 grader code is preserved in git history (it was the pre-reorg `eval.py`;
-see the commit before "Reorganize: eval.py = authoritative v2 …"). The candidate
-transcripts (`eval_transcripts.jsonl`) are shared and unchanged, so a v1 regrade
-is `git checkout <that commit> -- eval.py` then
-`python eval.py grade --rubric critique_eval_rubric_updated.md --grader-prompt critique_eval_grader_prompt.txt`.
+The v1 grader code is preserved in git history (it was the pre-reorganization
+`eval.py`). The candidate transcripts (`../../eval_transcripts.jsonl`) are shared
+and unchanged, and the current items live at
+`../../data/eval/critique_eval_annotated_items_v2.jsonl`. For exact historical
+reproduction, check out the pre-reorganization commit rather than mixing its
+`eval.py` with the current layout. The active pipeline uses the independently
+versioned candidate prompt under `../../prompts/candidates/`.

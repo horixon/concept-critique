@@ -7,7 +7,7 @@ a 5-point dimension scale {0,.25,.5,.75,1}, returns structured flags instead of 
 item_score, and the harness recomputes the score in code and applies the annotation
 score caps.
 
-  python eval.py merge                      # base + overrides -> critique_eval_annotated_items_v2.jsonl
+  python eval.py merge                      # base + overrides -> data/eval/..._v2.jsonl
   python eval.py generate --models haiku sonnet opus fable --samples 3
   python eval.py grade    --grader opus
   python eval.py summarize
@@ -35,17 +35,6 @@ import runner  # DEFAULT_MODELS, call_model, extract_text, sha256_file, git_info
 
 MODELS = runner.DEFAULT_MODELS
 
-# The candidate instruction is fixed by the eval spec (300-word cap is intentional).
-CANDIDATE_INSTRUCTION = """You are critiquing an argument to a conceptual question.
-
-Question:
-{question}
-
-Argument:
-{argument}
-
-Provide the strongest critique in 300 words or fewer. Identify the most important conceptual weakness, explain how it affects the conclusion, and distinguish whether it defeats, narrows, or merely qualifies the argument. Do not ask only for more detail or implementation guidance."""
-
 # The candidate instruction asks for <= 300 words. We do NOT truncate (that would
 # cut reasoning mid-sentence and add an evaluation artifact); instead we record
 # compliance per candidate and report the violation rate.
@@ -61,9 +50,10 @@ DIM_VALUES = [0, 0.25, 0.5, 0.75, 1]
 DISPOSITIONS = {"defeats", "narrows", "qualifies", "no_valid_critique"}
 
 # Default inputs (v2 is authoritative)
-BASE_ITEMS = "critique_eval_annotated_items.jsonl"
-OVERRIDES = "critique_eval_annotation_overrides_v2.jsonl"
-DEFAULT_ITEMS = "critique_eval_annotated_items_v2.jsonl"
+BASE_ITEMS = "data/eval/critique_eval_annotated_items.jsonl"
+OVERRIDES = "data/eval/critique_eval_annotation_overrides_v2.jsonl"
+DEFAULT_ITEMS = "data/eval/critique_eval_annotated_items_v2.jsonl"
+DEFAULT_CANDIDATE_PROMPT = "prompts/candidates/critique_300w_v1.txt"
 DEFAULT_RUBRIC = "critique_eval_rubric_v2.md"
 DEFAULT_GRADER_PROMPT = "critique_eval_grader_prompt_v2.txt"
 V2_FIELDS = ["explicit_concessions", "minimum_full_credit_elements", "non_novel_restatements",
@@ -141,7 +131,7 @@ def _write_manifest(path: str, entry: dict[str, Any]) -> None:
 # ------------------------------------------------------------------- merge
 
 def merge(args: argparse.Namespace) -> None:
-    """Overlay v2 annotation overrides onto the base items -> critique_eval_annotated_items_v2.jsonl."""
+    """Overlay v2 annotation overrides onto the base items -> the versioned v2 item set."""
     base = load_items(args.base)
     overrides = {o["source_id"]: o for o in load_jsonl(args.overrides)}
     base_sids = {it["source_id"] for it in base}
@@ -174,8 +164,23 @@ def merge(args: argparse.Namespace) -> None:
 
 # ---------------------------------------------------------------- generate
 
-def candidate_prompt(item: dict[str, Any]) -> str:
-    return CANDIDATE_INSTRUCTION.format(question=item["question"], argument=item["argument"])
+def load_candidate_prompt(path: str) -> str:
+    """Load and minimally validate a versioned candidate-generation template."""
+    with open(path, encoding="utf-8") as fh:
+        template = fh.read().strip()
+    missing = [field for field in ("question", "argument") if "{" + field + "}" not in template]
+    if missing:
+        raise SystemExit(f"candidate prompt {path} missing placeholder(s): {', '.join(missing)}")
+    try:
+        template.format(question="Q", argument="A")
+    except (KeyError, ValueError) as exc:
+        raise SystemExit(f"candidate prompt {path} has an invalid placeholder: {exc}") from exc
+    return template
+
+
+def candidate_prompt(item: dict[str, Any], template: str) -> str:
+    """Render one item without modifying its stored question or argument."""
+    return template.format(question=item["question"], argument=item["argument"])
 
 
 def generate(args: argparse.Namespace) -> None:
@@ -183,23 +188,41 @@ def generate(args: argparse.Namespace) -> None:
     if args.limit:
         items = items[: args.limit]
     models = {a: MODELS[a] for a in args.models}
-    prov = make_provenance(sys.argv[1:], {"phase": "generate",
-                                          "items_path": args.items, "items_sha256": runner.sha256_file(args.items),
-                                          "models": models, "samples": args.samples, "max_tokens": args.max_tokens})
+    candidate_template = load_candidate_prompt(args.candidate_prompt)
+    candidate_prompt_sha256 = runner.sha256_file(args.candidate_prompt)
+    candidate_prompt_version = os.path.splitext(os.path.basename(args.candidate_prompt))[0]
+    prov = make_provenance(
+        sys.argv[1:],
+        {
+            "phase": "generate",
+            "items_path": args.items,
+            "items_sha256": runner.sha256_file(args.items),
+            "candidate_prompt_path": args.candidate_prompt,
+            "candidate_prompt_version": candidate_prompt_version,
+            "candidate_prompt_sha256": candidate_prompt_sha256,
+            "models": models,
+            "samples": args.samples,
+            "max_tokens": args.max_tokens,
+        },
+    )
 
     # Resume key includes an experiment fingerprint (prompt + generation config), so a
     # stored candidate is reused only when the item's prompt and config are unchanged.
-    def done_key(r):
+    def done_key(r: dict[str, Any]) -> tuple[str, int, str | None, int]:
         eid = r.get("experiment_id") or runner.experiment_id(
             r["prompt"], None, r.get("max_tokens", args.max_tokens))
         model_id = r.get("model_id") or MODELS.get(r["model_alias"])
         return (eid, r["eval_id"], model_id, r["sample_number"])
 
     done = {done_key(r) for r in load_jsonl(args.output) if r.get("error") is None}
-    jobs = [(it, a, mid, s)
-            for it in items for a, mid in models.items() for s in range(args.samples)
-            if (runner.experiment_id(candidate_prompt(it), None, args.max_tokens),
-                it["eval_id"], mid, s) not in done]
+    jobs = []
+    for item in items:
+        prompt = candidate_prompt(item, candidate_template)
+        eid = runner.experiment_id(prompt, None, args.max_tokens)
+        for alias, model_id in models.items():
+            for sample in range(args.samples):
+                if (eid, item["eval_id"], model_id, sample) not in done:
+                    jobs.append((item, alias, model_id, sample, prompt, eid))
 
     print(f"run_id={prov['run_id']}  git={_git_short(prov)}", file=sys.stderr)
     print(f"generate: {len(items)} items x {len(models)} models x {args.samples} samples; "
@@ -211,17 +234,28 @@ def generate(args: argparse.Namespace) -> None:
     client = anthropic.Anthropic(max_retries=5)
 
     def run_one(job) -> dict[str, Any]:
-        item, alias, model_id, sample = job
-        prompt = candidate_prompt(item)
+        item, alias, model_id, sample, prompt, eid = job
         row = {
-            "run_id": prov["run_id"], "eval_id": item["eval_id"], "source_id": item.get("source_id"),
-            "model_alias": alias, "model_id": model_id, "sample_number": sample,
+            "run_id": prov["run_id"],
+            "eval_id": item["eval_id"],
+            "source_id": item.get("source_id"),
+            "model_alias": alias,
+            "model_id": model_id,
+            "sample_number": sample,
             "timestamp": runner._now_iso(),
-            "question": item["question"], "argument": item["argument"], "prompt": prompt,
+            "question": item["question"],
+            "argument": item["argument"],
+            "prompt": prompt,
+            "candidate_prompt_version": candidate_prompt_version,
+            "candidate_prompt_sha256": candidate_prompt_sha256,
             "max_tokens": args.max_tokens,
-            "experiment_id": runner.experiment_id(prompt, None, args.max_tokens),
-            "response_text": None, "word_count": None, "word_limit_exceeded": None,
-            "stop_reason": None, "usage": None, "error": None,
+            "experiment_id": eid,
+            "response_text": None,
+            "word_count": None,
+            "word_limit_exceeded": None,
+            "stop_reason": None,
+            "usage": None,
+            "error": None,
         }
         try:
             resp = runner.call_model(client, model_id, None, prompt, args.max_tokens)
@@ -247,7 +281,7 @@ def generate(args: argparse.Namespace) -> None:
                     fail += 1; print(f"FAIL {label}: {row['error']['type']}", file=sys.stderr)
                 else:
                     ok += 1; print(f"ok   {label} ({row['word_count']}w)", file=sys.stderr)
-    _write_manifest("eval_runs.jsonl", {**prov, "finished_at": runner._now_iso(),
+    _write_manifest(args.manifest, {**prov, "finished_at": runner._now_iso(),
                                         "output_path": os.path.abspath(args.output),
                                         "succeeded": ok, "failed": fail})
     print(f"\ngenerate done: ok={ok} fail={fail}", file=sys.stderr)
@@ -440,7 +474,7 @@ def grade(args: argparse.Namespace) -> None:
                 else:
                     caps_note = f" caps={row['caps_applied']}" if row["caps_applied"] else ""
                     ok += 1; print(f"ok   {label} score={row['item_score']:.3f}{caps_note}", file=sys.stderr)
-    _write_manifest("eval_runs.jsonl", {**prov, "finished_at": runner._now_iso(),
+    _write_manifest(args.manifest, {**prov, "finished_at": runner._now_iso(),
                                         "output_path": os.path.abspath(args.output),
                                         "graded": ok, "failed": fail})
     print(f"\ngrade done: ok={ok} fail={fail}", file=sys.stderr)
@@ -569,7 +603,7 @@ def summarize(args: argparse.Namespace) -> None:
         json.dump(results, fh, ensure_ascii=False, indent=2)
 
     examples = _pick_examples(grades, transcripts, items, robust_ids)
-    _write_markdown(args.markdown_output, results, examples)
+    _write_markdown(args.markdown_output, results, examples, args.report_title)
     print(f"wrote {args.json_output} and {args.markdown_output}", file=sys.stderr)
     print("models: " + "  ".join(f"{a}={(model_stats[a]['mean'] or 0):.3f}" for a in aliases), file=sys.stderr)
 
@@ -615,10 +649,10 @@ def _fmt(x, nd=3):
     return "—" if x is None else f"{x:.{nd}f}"
 
 
-def _write_markdown(path: str, r: dict[str, Any], examples: list[dict]) -> None:
+def _write_markdown(path: str, r: dict[str, Any], examples: list[dict], title: str) -> None:
     aliases = list(r["model_stats"])
     L = []
-    L.append("# Conceptual Critique Eval — Results (v2 grader)\n")
+    L.append(f"# {title}\n")
     L.append(f"Grader model: **{r['grader_model']}**  |  items: {r['n_items']}  |  grades: {r['n_grades']}  "
              f"|  generation failures: {r['generation_failures']}  |  grading failures: {r['grading_failures']}\n")
 
@@ -672,8 +706,8 @@ def _write_markdown(path: str, r: dict[str, Any], examples: list[dict]) -> None:
     L.append("## 6. Response length & word-limit compliance\n")
     L.append(f"Pearson correlation between response word count and recomputed item score: "
              f"**{_fmt(r['length_score_correlation'])}**  \n"
-             "A large positive correlation would be a verbosity-confound warning; the 300-word cap keeps this small.\n")
-    L.append(f"The {r['word_limit']}-word cap is **recorded, not enforced** — responses are never truncated "
+             "A large positive correlation would be a verbosity-confound warning; the observed correlation is descriptive, not proof of style invariance.\n")
+    L.append(f"The {r['word_limit']}-word instruction is **recorded, not enforced** — responses are never truncated "
              "(truncation cuts reasoning mid-sentence and adds an artifact). Violation rate by model:\n")
     L.append("| model | violation rate | violations / n | mean words | max words |\n|---|---:|---:|---:|---:|")
     for a in aliases:
@@ -681,9 +715,10 @@ def _write_markdown(path: str, r: dict[str, Any], examples: list[dict]) -> None:
         L.append(f"| {a} | {_fmt(w['violation_rate'], 2)} | {w['violations']}/{w['n']} | "
                  f"{'' if w['mean_words'] is None else round(w['mean_words'])} | {w['max_words']} |")
     L.append("")
-    L.append("The grader is instructed not to reward length, and the near-zero length–score correlation "
-             f"({_fmt(r['length_score_correlation'])}) supports that: the models that overshoot the cap most do not "
-             "gain score from it, so the (small, ~10% max) cap violations are not confounding the results.\n")
+    L.append("The grader is instructed not to reward length. The modest length–score correlation "
+             f"({_fmt(r['length_score_correlation'])}) provides little evidence that verbosity alone drove scores "
+             "in this sample, but it does not rule out nonlinear or stylistic effects. Overruns were frequent for "
+             "some models but modest in magnitude (the maximum response was roughly 10% over the request).\n")
 
     L.append("## 7. Failures / invalid grader outputs\n")
     L.append(f"- generation failures: {r['generation_failures']}\n"
@@ -732,9 +767,13 @@ def main(argv: list[str] | None = None) -> int:
 
     g = sub.add_parser("generate", help="Generate candidate critiques.")
     g.add_argument("--items", default=DEFAULT_ITEMS)
+    g.add_argument("--candidate-prompt", default=DEFAULT_CANDIDATE_PROMPT,
+                   help="Candidate-generation template with {question} and {argument} placeholders.")
     g.add_argument("--models", nargs="+", choices=sorted(MODELS), default=sorted(MODELS))
     g.add_argument("--samples", type=int, default=3)
     g.add_argument("--output", default="eval_transcripts.jsonl")
+    g.add_argument("--manifest", default="eval_runs.jsonl",
+                   help="Append run provenance here (default: eval_runs.jsonl).")
     g.add_argument("--max-tokens", type=int, default=8192)
     g.add_argument("--concurrency", type=int, default=6)
     g.add_argument("--limit", type=int, default=0, help="Only the first N items (smoke testing).")
@@ -747,6 +786,8 @@ def main(argv: list[str] | None = None) -> int:
     gr.add_argument("--grader-prompt", default=DEFAULT_GRADER_PROMPT)
     gr.add_argument("--grader", choices=sorted(MODELS), default="opus")
     gr.add_argument("--output", default="eval_grades.jsonl")
+    gr.add_argument("--manifest", default="eval_runs.jsonl",
+                    help="Append run provenance here (default: eval_runs.jsonl).")
     gr.add_argument("--max-tokens", type=int, default=8192)
     gr.add_argument("--concurrency", type=int, default=8)
     gr.add_argument("--limit", type=int, default=0, help="Only the first N candidates (smoke testing).")
@@ -758,6 +799,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--grades", default="eval_grades.jsonl")
     s.add_argument("--json-output", default="eval_results.json")
     s.add_argument("--markdown-output", default="eval_results.md")
+    s.add_argument("--report-title", default="Conceptual Critique Eval — Results (v2 grader)")
     s.set_defaults(func=summarize)
 
     args = p.parse_args(argv)

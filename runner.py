@@ -5,8 +5,8 @@ Reads conceptual questions + arguments from a JSONL file, calls each configured
 Claude model multiple times via the Anthropic Messages API, and appends a
 complete transcript per sample to a JSONL output file.
 
-Runs are resumable: on startup the output file is scanned and any
-(question_id, model, sample) that already succeeded is skipped.
+Runs are resumable: on startup the output file is scanned and any successful
+(prompt/config fingerprint, question, exact model, sample) key is skipped.
 """
 
 from __future__ import annotations
@@ -47,8 +47,10 @@ def experiment_id(prompt: str, system: str | None, max_tokens: int) -> str:
     a stale answer.
     """
     h = hashlib.sha256()
-    h.update(prompt.encode("utf-8")); h.update(b"\x00")
-    h.update((system or "").encode("utf-8")); h.update(b"\x00")
+    h.update(prompt.encode("utf-8"))
+    h.update(b"\x00")
+    h.update((system or "").encode("utf-8"))
+    h.update(b"\x00")
     h.update(str(max_tokens).encode("utf-8"))
     return h.hexdigest()[:16]
 
@@ -77,8 +79,12 @@ class Job:
 
     @property
     def key(self) -> SampleKey:
-        return SampleKey(experiment_id(self.prompt, self.system, self.max_tokens),
-                         self.record["id"], self.model_id, self.sample_number)
+        return SampleKey(
+            experiment_id(self.prompt, self.system, self.max_tokens),
+            self.record["id"],
+            self.model_id,
+            self.sample_number,
+        )
 
     @property
     def label(self) -> str:

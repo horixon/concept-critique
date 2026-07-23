@@ -1,0 +1,16 @@
+{"eval_id": 100, "source_id": 100, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 101, "source_id": 100, "pair_role": "flawed", "intended_flaw": "The conclusion discards the argument's own dependence, asymmetry, and explainable-error conditions and turns conditional conciliation into an unconditional fixed update."}
+{"eval_id": 200, "source_id": 200, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 201, "source_id": 200, "pair_role": "flawed", "intended_flaw": "The conclusion abandons the fidelity requirement and makes usefulness sufficient even when the explanation is false about what drove the decision."}
+{"eval_id": 300, "source_id": 300, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 301, "source_id": 300, "pair_role": "flawed", "intended_flaw": "The conclusion turns implementation consistency into sufficient evidence of substantive quality after the argument explicitly distinguished those properties."}
+{"eval_id": 400, "source_id": 400, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 401, "source_id": 400, "pair_role": "flawed", "intended_flaw": "The conclusion defines omitted factors as irrelevant from in-sample fit, defeating the earlier demand for stress tests under reintroduction, interactions, and boundary changes."}
+{"eval_id": 500, "source_id": 500, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 501, "source_id": 500, "pair_role": "flawed", "intended_flaw": "The conclusion makes prediction alone sufficient precisely where the argument required causal and invariance evidence because intervention and distribution shift can break the relationship."}
+{"eval_id": 600, "source_id": 600, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 601, "source_id": 600, "pair_role": "flawed", "intended_flaw": "The conclusion treats consensus as truth evidence while discarding the process conditions the argument said determine whether consensus is informative."}
+{"eval_id": 700, "source_id": 700, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 701, "source_id": 700, "pair_role": "flawed", "intended_flaw": "The conclusion assumes the proxy-target link remains valid in the exact adaptive setting where the argument warned that optimization can break or redefine it."}
+{"eval_id": 800, "source_id": 800, "pair_role": "robust", "intended_flaw": null}
+{"eval_id": 801, "source_id": 800, "pair_role": "flawed", "intended_flaw": "The conclusion uses nominal reversibility as sufficient after the argument required total state restoration and explicitly recognized hidden irreversibility."}

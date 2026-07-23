@@ -113,6 +113,22 @@ def test_parse_grader_json_repair():
         pass
 
 
+# --- candidate prompt is separately versioned from grader prompt ---------
+
+def test_candidate_prompt_renders_item_without_mutating_it():
+    item = {"question": "What follows?", "argument": "P therefore Q.", "annotation": {"x": 1}}
+    before = dict(item)
+    template = "QUESTION={question}\nARGUMENT={argument}\nCritique it."
+    rendered = E.candidate_prompt(item, template)
+    assert rendered == "QUESTION=What follows?\nARGUMENT=P therefore Q.\nCritique it."
+    assert item == before
+
+
+def test_default_candidate_prompt_has_required_placeholders():
+    template = E.load_candidate_prompt(E.DEFAULT_CANDIDATE_PROMPT)
+    assert "{question}" in template and "{argument}" in template
+
+
 # --- duplicate-record selection (prefer ok over error) --------------------
 
 def test_dedup_prefers_ok_over_error():

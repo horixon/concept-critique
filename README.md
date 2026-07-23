@@ -1,5 +1,9 @@
 # Concept-critique experiment harness
 
+**Evaluation scope:** the primary reported result is the root 11-item v2 eval.
+Everything under `experiments/` is separate follow-on work. See
+[`EVALUATION_SCOPE.md`](EVALUATION_SCOPE.md).
+
 A minimal, resumable harness for sampling Claude models on conceptual questions,
 plus a graded **conceptual-critique evaluation** built on top of it. Each model
 writes the strongest critique of a short argument; an Opus grader scores it against
@@ -22,14 +26,15 @@ arguments × 3 samples × 4 models = 132 critiques.
 The sanity check **Opus > Sonnet > Haiku holds**, and Fable ranks highest (reported,
 not assumed). Read this as suggestive, not validated: the top three CIs **overlap**,
 it's only 11 items with one fixed grader, and the grader sees the human annotation.
-What's *not* driving the numbers: length (word-count↔score correlation ≈ 0.10, and
-the cap is recorded not enforced), penalty avoidance (the gap is earned dimension
-credit), or over-attacking (robust-control means track flaw-item means — stronger
-models qualify rather than invent flaws). Ordering is unchanged under equal weights.
+The checks found little evidence that the ordering was explained by simple response
+length (word-count↔score correlation ≈ 0.10; the limit is recorded, not enforced),
+penalty avoidance, or unearned attacks on the six annotated controls. These checks
+do not rule out nonlinear or stylistic grader effects. Ordering is unchanged under
+equal weights.
 
 **One sharp failure, honestly reported.** A stricter **v3** grader built to catch
 polished restatement / operational substitution / unearned labels **failed two of
-its predeclared calibration gates** — the polished-restatement novelty check (0/2)
+its encoded promotion gates** — the polished-restatement novelty check (0/2)
 and Spearman correlation (0.68 < 0.70). Because it failed those gates, I **froze it
 without using it to regrade the main evaluation; the results above are therefore the
 v2 results.** Graded annotation-free, it had read a polished restatement's concrete
@@ -47,7 +52,8 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 ## Input format
 
-One JSON object per line. Fields:
+A stream of JSON objects, normally one object per line. The exploratory runner also
+accepts pretty-printed multi-line objects for hand-authored inputs. Fields:
 
 | field      | required | notes |
 |------------|----------|-------|
@@ -57,13 +63,13 @@ One JSON object per line. Fields:
 | `system`   | no       | per-question system prompt (overrides `--system`) |
 | `metadata` | no       | carried through to the transcript verbatim |
 
-See `questions.example.jsonl`.
+See `data/exploration/questions.example.jsonl`.
 
 ## Run
 
-Copy `run.sh.example` → `run.sh` (gitignored) and fill in your key — `run.sh` holds
-the API key and the canonical flags, so every result comes from a single, known
-invocation. Then:
+Copy `run.sh.example` → `run.sh` (gitignored), export `ANTHROPIC_API_KEY` in your
+shell, and use the script as the canonical invocation. The script contains flags,
+not credentials, and exits immediately if the environment variable is absent:
 
 ```bash
 ./run.sh            # full run
@@ -73,7 +79,7 @@ invocation. Then:
 `run.sh` calls `runner.py` under the hood; the direct form is:
 
 ```bash
-python runner.py -i questions.example.jsonl -o transcripts.jsonl -n 3
+python runner.py -i data/exploration/questions.example.jsonl -o transcripts.jsonl -n 3
 ```
 
 Options:
@@ -88,7 +94,7 @@ Options:
 ### Preview what will run
 
 ```bash
-python runner.py -i questions.example.jsonl -o transcripts.jsonl -n 2 --dry-run
+python runner.py -i data/exploration/questions.example.jsonl -o transcripts.jsonl -n 2 --dry-run
 ```
 
 `--dry-run` scans the output file for already-completed samples and prints only
@@ -105,7 +111,7 @@ DRY RUN — planned=12 already_done=1 to_run=11
 ### Run faster
 
 ```bash
-python runner.py -i questions.example.jsonl -o transcripts.jsonl -n 5 -c 8
+python runner.py -i data/exploration/questions.example.jsonl -o transcripts.jsonl -n 5 -c 8
 ```
 
 `-c/--concurrency` runs that many calls in parallel via a thread pool (the
@@ -184,7 +190,7 @@ joins to a `runs.jsonl` entry (one per run) carrying the full provenance:
     "branch": "main",
     "dirty": false                        // true => uncommitted changes present
   },
-  "input_path": "questions.jsonl",
+    "input_path": "data/exploration/questions.jsonl",
   "input_sha256": "2a8452232e53...",      // fingerprint of the questions file
   "argv": ["-i", "...", "-n", "3", ...],  // effective flags
   "models": {"opus": "claude-opus-4-8", ...},
@@ -242,8 +248,8 @@ only the missing samples are generated.
   adaptively on its own). Add per-model config in `call_model` if you need it.
 - **Fable 5 requires 30-day data retention** on your org (not available under
   zero-data-retention). If every Fable call 400s, check the org retention setting.
-- Runs are sequential. For higher throughput, wrap the inner call in a thread
-  pool — the resume logic already makes re-runs safe.
+- Calls are sequential by default; `--concurrency N` enables a bounded thread
+  pool while keeping all JSONL writes on the main thread.
 
 ---
 
@@ -268,7 +274,9 @@ runner.py      # concept-critique harness + shared LLM/provenance/resume helpers
 analysis.py    # failure inspection + report artifacts (recompute-only)
 calibrate.py   # grader calibration on the Q0–Q2 unit-test set
 report.py      # render one transcript row to a PDF
-tests/         # test_eval.py + test_resume.py (deterministic, no API)
+prompts/candidates/   # versioned prompts sent to candidate models
+data/           # versioned exploration, eval, and calibration inputs
+tests/         # deterministic eval, resume, and experiment tests (no API)
 archive/v1/    # original grader (evidence + README)
 archive/v3_experiment/   # stricter v3 grader, not promoted (+ README)
 writeup/       # report + figure tooling (not part of the eval; own README)
@@ -276,16 +284,25 @@ writeup/       # report + figure tooling (not part of the eval; own README)
 
 ## Inputs (versioned)
 
-- `critique_eval_annotated_items.jsonl` (base) + `critique_eval_annotation_overrides_v2.jsonl` → merged into `critique_eval_annotated_items_v2.jsonl`.
+- `data/eval/critique_eval_annotated_items.jsonl` (base) + `data/eval/critique_eval_annotation_overrides_v2.jsonl` → merged into `data/eval/critique_eval_annotated_items_v2.jsonl`.
+- `prompts/candidates/critique_300w_v1.txt` — fixed candidate-generation prompt for the final results.
 - `critique_eval_rubric_v2.md`, `critique_eval_grader_prompt_v2.txt`.
+
+The versions are independent: the item set supplies `question`, `argument`, and
+grader-only `annotation`; the candidate prompt generates a critique; the grader
+prompt + rubric judge the stored critique; Python owns the scoring policy. The
+v1/v2/v3 labels in `archive/` describe **grader revisions**, not candidate-prompt
+revisions. This separation permits regrading stored critiques without regenerating
+them, or testing a new candidate prompt without silently mixing experiments.
 
 ## Reproduce
 
 ```bash
-export ANTHROPIC_API_KEY=...   # or: export ANTHROPIC_API_KEY=$(sed -n 's/.*ANTHROPIC_API_KEY="\([^"]*\)".*/\1/p' run.sh)
+export ANTHROPIC_API_KEY=...
 
-python eval.py merge                                   # -> critique_eval_annotated_items_v2.jsonl
-python eval.py generate --models haiku sonnet opus fable --samples 3   # -> eval_transcripts.jsonl
+python eval.py merge                                   # -> data/eval/critique_eval_annotated_items_v2.jsonl
+python eval.py generate --models haiku sonnet opus fable --samples 3 \
+  --candidate-prompt prompts/candidates/critique_300w_v1.txt           # -> eval_transcripts.jsonl
 python eval.py grade    --grader opus                  # -> eval_grades.jsonl
 python eval.py summarize                               # -> eval_results.json, eval_results.md
 python analysis.py                                     # -> eval_failure_analysis.md, eval_failure_examples.json,
@@ -294,7 +311,11 @@ python calibrate.py                                    # grader calibration -> c
 ```
 
 Every phase is append-only and resumable. Generation resume is fingerprinted
-(see **Resumability** above), so editing an item regenerates only that item.
+(see **Resumability** above), so editing an item or candidate prompt regenerates
+only candidates whose rendered prompt changed. Newly generated transcript rows
+record the candidate-prompt version and SHA-256; legacy stored rows remain valid
+because their exact rendered prompt already participates in the resume fingerprint.
+Grades separately record the grader prompt and rubric in their run provenance.
 
 ## Scoring
 
@@ -322,10 +343,18 @@ across arguments). Reports show items covered and successful generations per mod
 
 ## Tests
 
-Focused, deterministic, no API calls (`python -m pytest tests/`, or run each file directly):
+Focused, deterministic, no API calls and no test-framework dependency:
+
+```bash
+python3 tests/test_eval.py
+python3 tests/test_resume.py
+python3 tests/test_experiments.py
+```
 
 - `tests/test_eval.py` — score calculation + clipping, penalty cap, novelty/control/impact caps, invalid grader values, malformed-JSON repair, duplicate-record selection, per-item (cluster) aggregation, partial coverage, robust-control identification, over-limit recording (fixtures in `tests/fixtures/`).
 - `tests/test_resume.py` — experiment-fingerprint resume isolation (edited prompt/system/config regenerates; unchanged resumes; legacy rows resume).
+- `tests/test_experiments.py` — paired-item construction, role blinding,
+  synthetic prompt rendering, and annotation/classifier schema validation.
 
 ## Grader calibration
 
@@ -333,3 +362,19 @@ Focused, deterministic, no API calls (`python -m pytest tests/`, or run each fil
 and compares to `human_label` — dimension agreement, penalty precision/recall,
 disposition accuracy, Spearman, pairwise ordering. It's a unit test of rubric
 *implementation*, not evidence the rubric generalizes.
+
+## Follow-on experiments
+
+The root evaluation remains the single authoritative primary eval. Independent
+studies live under `experiments/<name>/`, with their own protocol, inputs, outputs,
+and reproduction commands. See `experiments/README.md` for the shared contract.
+
+- `experiments/art_design/` contains the existing ungraded exploration and the
+  separate six-item graded extension.
+- `experiments/controlled_variants/` tests whether critiques change when one
+  argument is flawed, repaired, or explicitly excludes operational objections.
+- `experiments/questions_1_8/` pairs eight robust arguments with eight minimally
+  changed flawed counterparts and uses explicitly synthetic, pre-generation
+  references. Its results are a separate stress test, not human-ground-truth scores.
+
+Experiment scores must not be pooled with the 11-item main result.

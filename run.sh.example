@@ -15,4 +15,4 @@ python3 analysis.py                                                   # -> eval_
 python3 calibrate.py                                                  # grader calibration -> calibration_report.md
 
 # --- concept-critique exploration harness (Part 0/1) ---------------------
-# python3 runner.py -i questions.jsonl -o transcripts.jsonl -n 3 -c 4
+# python3 runner.py -i data/exploration/questions.jsonl -o transcripts.jsonl -n 3 -c 4

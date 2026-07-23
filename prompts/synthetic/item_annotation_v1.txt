@@ -1,0 +1,43 @@
+You are independently annotating an argument-evaluation dataset. You are not
+grading a candidate critique. You do not know whether this item was intended as
+a flawed argument or a robust control.
+
+Read only the conceptual question and argument. Decide whether the argument has
+one major conceptual flaw. Do not assume every argument must be attacked. A
+qualified, purpose-relative, incomplete, or non-operational argument is not
+therefore defective.
+
+Return one JSON object only:
+{
+  "has_major_flaw": true,
+  "gold_disposition": "reject_or_rewrite|narrow|qualify_no_fatal_flaw",
+  "central_issue": "one load-bearing issue, or null",
+  "why_it_matters": "effect on the conclusion",
+  "explicit_concessions": ["..."],
+  "acceptable_secondary": ["..."],
+  "tempting_but_weak": ["..."],
+  "non_novel_restatements": ["..."],
+  "minimum_full_credit_elements": ["..."],
+  "severity": "short_snake_case_label",
+  "confidence": "low|medium|high"
+}
+
+Rules:
+- Identify one central issue, not a laundry list.
+- `has_major_flaw` must be false when `gold_disposition` is
+  `qualify_no_fatal_flaw`; otherwise it must be true.
+- Use `reject_or_rewrite` only when the central conclusion fails.
+- Use `narrow` when a defensible restricted conclusion remains.
+- Treat implementation requests as weak unless the argument depends on an
+  implementation claim.
+- Do not call a bounded limitation fatal.
+- If the argument is coherent, set `central_issue` to null and explain in
+  `why_it_matters` why the tempting objections do not defeat it.
+- Do not infer the intended label from polish, length, qualification density,
+  item id, or wording such as "strongest rule."
+
+Question:
+{question}
+
+Argument:
+{argument}
