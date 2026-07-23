@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a descriptive report from an art & design exploration run.
 
-Reads the transcripts produced by `runner.py` on `questions.art_design.jsonl`
+Reads the transcripts produced by `runner.py` on this experiment's item file
 and emits a Markdown report: run provenance, per-model descriptive stats
 (word counts, output tokens, stop reasons, refusals/errors), and a per-question
 excerpt from every model so critiques can be compared side by side.
@@ -12,10 +12,7 @@ critique would catch is the author's `expect` annotation from the input file,
 labelled as such — not a measurement. Recompute-only: no API calls.
 
 Usage:
-  python3 art_design_report.py \
-      [--transcripts art_design_transcripts.jsonl] \
-      [--questions questions.art_design.jsonl] \
-      [--out art_design_report.md]
+  python3 experiments/art_design/exploration/report.py
 """
 
 from __future__ import annotations
@@ -93,9 +90,9 @@ def out_tokens(row: dict[str, Any]) -> int | None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--transcripts", default="art_design_transcripts.jsonl")
-    ap.add_argument("--questions", default="questions.art_design.jsonl")
-    ap.add_argument("--out", default="art_design_report.md")
+    ap.add_argument("--transcripts", default="experiments/art_design/exploration/transcripts.jsonl")
+    ap.add_argument("--questions", default="experiments/art_design/exploration/items.jsonl")
+    ap.add_argument("--out", default="experiments/art_design/exploration/report.md")
     args = ap.parse_args()
 
     questions = load_jsonl(args.questions)
@@ -142,9 +139,11 @@ def main() -> int:
     A(
         "A separate, exploratory set of six conceptual questions on art and design, "
         "each paired with a one-sided argument for the models to critique. It reuses "
-        "the `runner.py` harness and the same critique framing as the main "
-        "submission, but it is **not** part of that submission and has **no grader "
-        "or gold labels** — this report is descriptive, not scored."
+        "the `runner.py` harness with item-specific templates stored in "
+        "`experiments/art_design/exploration/items.jsonl`; unlike the graded eval, it "
+        "does not use `prompts/candidates/critique_300w_v1.txt`. It is **not** part "
+        "of the primary evaluation and has **no grader or gold labels** — this report is "
+        "descriptive, not scored."
     )
     A("")
     A("## Setup")
@@ -171,7 +170,7 @@ def main() -> int:
         )
     A("")
     A(
-        "_No word limit is imposed in this run (unlike the main eval's 300-word cap), "
+        "_No word limit is imposed in this run (unlike the main eval's 300-word instruction), "
         "so word counts describe natural critique length, not compliance._"
     )
     A("")
@@ -212,10 +211,11 @@ def main() -> int:
     A("")
     A("```bash")
     A("export ANTHROPIC_API_KEY=sk-ant-...")
-    A("python3 runner.py -i questions.art_design.jsonl \\")
-    A("  -o art_design_transcripts.jsonl -n 2 -m haiku sonnet opus fable \\")
-    A("  -c 6 --max-tokens 4096 --manifest art_design_runs.jsonl")
-    A("python3 art_design_report.py   # regenerates this file")
+    A("python3 runner.py -i experiments/art_design/exploration/items.jsonl \\")
+    A("  -o experiments/art_design/exploration/transcripts.jsonl -n 2 \\")
+    A("  -m haiku sonnet opus fable -c 6 --max-tokens 4096 \\")
+    A("  --manifest experiments/art_design/exploration/runs.jsonl")
+    A("python3 experiments/art_design/exploration/report.py")
     A("```")
     A("")
 

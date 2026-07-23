@@ -264,6 +264,13 @@
         "fable": 304.2121212121212
       }
     },
-    "grader_model": "opus"
+    "grader_model": "opus",
+    "novelty_zero": [
+      {
+        "eval_id": 1,
+        "model": "haiku",
+        "sample": 1
+      }
+    ]
   }
 }

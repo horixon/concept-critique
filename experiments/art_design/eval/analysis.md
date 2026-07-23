@@ -1,6 +1,6 @@
 # Art & Design Eval — Results and Analysis (v2 grader)
 
-Same graded pipeline as the main submission (`eval.py` generate → grade → summarize) run on a **separate 6-item art/design set**, graded by a fixed **Opus** grader; 72 grades. Scores are recomputed in code with the annotation caps — the grader returns structured flags, never an item_score. This set is **not** part of the main submission.
+Same graded pipeline as the primary evaluation (`eval.py` generate → grade → summarize) run on a **separate 6-item art/design set**, graded by a fixed **Opus** grader; 72 grades. It uses the same versioned candidate prompt (`prompts/candidates/critique_300w_v1.txt`) and v2 grader/rubric as the main eval, changing only the item set. Scores are recomputed in code with the annotation caps — the grader returns structured flags, never an item_score. This set is **not** part of the primary evaluation.
 
 ## Model results
 
@@ -37,7 +37,7 @@ There is a single robust-control item (eval_id [4], `aura-reproduction`): a deli
 ## Interpretation & limitations
 
 - Measures how well a short critique matches a human-annotated central flaw under the v2 rubric, as judged by one fixed Opus grader — not conceptual reasoning in general. Treat as suggestive.
-- **Only 6 items (1 control).** Item-level variance is large and the bootstrap CIs are wide and likely overlapping; do not over-read small mean gaps. The main submission (11 items, 6 controls) is the better-powered version.
+- **Only 6 items (1 control).** Item-level variance is large and the bootstrap CIs are wide and likely overlapping; do not over-read small mean gaps. The primary evaluation (11 items, 6 controls) is the better-powered version.
 - The grader sees the human annotation and may reward overlap with it; stronger models may raise valid critiques outside the annotated issue that the grader under-credits.
 - Robust-control validity depends on the human judgment that the `aura` argument has no fatal flaw.
 - A single fixed grader may favor its own critique style (Opus/Fable share lineage).

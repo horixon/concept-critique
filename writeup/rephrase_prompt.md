@@ -1,4 +1,4 @@
-Create a revised conceptual question and supporting argument based on the original questions.jsonl id 0 and add it as id 1.
+Create a revised conceptual question and supporting argument based on `data/exploration/questions.jsonl` id 0 and add it as id 1.
 
 The revision should preserve the underlying issue: whether downstream performance is enough to justify treating a compressed summary as preserving what matters under future use.
 

@@ -3,12 +3,12 @@
 
 Parallels analysis.py, but parameterized and free of the main eval's hardcoded
 narrative (item counts, control ids, and the Haiku-529 story are all specific to
-the submission). Reads the art/design items + transcripts + grades, recomputes
+the primary evaluation). Reads the art/design items + transcripts + grades, recomputes
 every score from the validated grader dimensions/penalties via eval.score's
 formula (already stored on each grade row as item_score), and writes:
 
-  art_design_eval_model_scores.csv   one row per model
-  art_design_eval_analysis.md        the per-model table + a result analysis
+  experiments/art_design/eval/model_scores.csv   one row per model
+  experiments/art_design/eval/analysis.md        per-model table + analysis
 
 Same aggregation as the main eval: model score = mean over items of the per-item
 sample mean; 95% CI is a cluster (item) bootstrap. Recompute-only, no API calls.
@@ -18,6 +18,12 @@ from __future__ import annotations
 
 import csv
 import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import analysis as A   # item_level (cluster bootstrap), spearman
 import eval as E        # load_items, load_jsonl, dedup, is_robust_control, DIMENSIONS, PENALTIES, MODELS
@@ -25,9 +31,10 @@ import eval as E        # load_items, load_jsonl, dedup, is_robust_control, DIME
 ORDER = ["haiku", "sonnet", "opus", "fable"]
 DISPLAY = {"haiku": "Haiku 4.5", "sonnet": "Sonnet 4.6", "opus": "Opus 4.8", "fable": "Fable 5"}
 
-ITEMS_PATH = "critique_eval_annotated_items_art_design.jsonl"
-TX_PATH = "art_design_eval_transcripts.jsonl"
-GR_PATH = "art_design_eval_grades.jsonl"
+BASE = "experiments/art_design/eval"
+ITEMS_PATH = f"{BASE}/items.jsonl"
+TX_PATH = f"{BASE}/transcripts.jsonl"
+GR_PATH = f"{BASE}/grades.jsonl"
 
 
 def mean(xs):
@@ -99,7 +106,7 @@ def pct(x):
 
 
 def write_csv(per_model):
-    with open("art_design_eval_model_scores.csv", "w", newline="", encoding="utf-8") as fh:
+    with open(f"{BASE}/model_scores.csv", "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["Model", "Mean", "ci95_lo", "ci95_hi", "Items", "Gens",
                     "Centrality", "Fidelity", "Novelty", "Impact",
@@ -117,10 +124,12 @@ def write_md(items, control_ids, flaw_ids, per_model, by_item, order_by_mean, ex
     L = []
     L.append("# Art & Design Eval — Results and Analysis (v2 grader)\n")
     L.append(
-        "Same graded pipeline as the main submission (`eval.py` generate → grade → summarize) run on a "
+        "Same graded pipeline as the primary evaluation (`eval.py` generate → grade → summarize) run on a "
         f"**separate 6-item art/design set**, graded by a fixed **Opus** grader; {n_grades} grades. "
-        "Scores are recomputed in code with the annotation caps — the grader returns structured flags, "
-        "never an item_score. This set is **not** part of the main submission.\n")
+        "It uses the same versioned candidate prompt (`prompts/candidates/critique_300w_v1.txt`) and v2 "
+        "grader/rubric as the main eval, changing only the item set. Scores are recomputed in code with "
+        "the annotation caps — the grader returns structured flags, "
+        "never an item_score. This set is **not** part of the primary evaluation.\n")
 
     L.append("## Model results\n")
     L.append("Model score = **mean over items of the per-item sample mean**; 95% CI is a bootstrap over **items** "
@@ -167,20 +176,21 @@ def write_md(items, control_ids, flaw_ids, per_model, by_item, order_by_mean, ex
     L.append("- Measures how well a short critique matches a human-annotated central flaw under the v2 rubric, as "
              "judged by one fixed Opus grader — not conceptual reasoning in general. Treat as suggestive.\n"
              "- **Only 6 items (1 control).** Item-level variance is large and the bootstrap CIs are wide and likely "
-             "overlapping; do not over-read small mean gaps. The main submission (11 items, 6 controls) is the "
+             "overlapping; do not over-read small mean gaps. The primary evaluation (11 items, 6 controls) is the "
              "better-powered version.\n"
              "- The grader sees the human annotation and may reward overlap with it; stronger models may raise valid "
              "critiques outside the annotated issue that the grader under-credits.\n"
              "- Robust-control validity depends on the human judgment that the `aura` argument has no fatal flaw.\n"
              "- A single fixed grader may favor its own critique style (Opus/Fable share lineage).\n")
-    open("art_design_eval_analysis.md", "w", encoding="utf-8").write("\n".join(L) + "\n")
+    with open(f"{BASE}/analysis.md", "w", encoding="utf-8") as fh:
+        fh.write("\n".join(L) + "\n")
 
 
 def main():
     items, control_ids, flaw_ids, per_model, by_item, order_by_mean, expected_ok, n_grades = build()
     write_csv(per_model)
     write_md(items, control_ids, flaw_ids, per_model, by_item, order_by_mean, expected_ok, n_grades)
-    print("wrote art_design_eval_model_scores.csv, art_design_eval_analysis.md")
+    print(f"wrote {BASE}/model_scores.csv, {BASE}/analysis.md")
     print("means:", {m: round(per_model[m]["mean"], 3) if per_model[m]["mean"] is not None else None for m in ORDER})
 
 

@@ -1,0 +1,45 @@
+You are blindly classifying one candidate critique for contrast analysis. The
+candidate model identity has been removed. Classify what the response actually
+does; do not grade its writing style and do not use an expected model ranking.
+
+Choose exactly one `primary_label` from:
+actual_reasoning_vs_reconstructed_justification
+evidence_underdetermines_reasoning
+purpose_relative_standard
+missing_threshold
+missing_process_or_documentation
+later_reviewer_bias
+coherence_not_truth
+generic_incompleteness
+no_major_conceptual_flaw
+other
+
+Return one JSON object only:
+{
+  "primary_label": "one allowed label",
+  "severity": "defeats|narrows|qualifies|no_major_flaw",
+  "targets_explicit_concession": true,
+  "operational_substitution": false,
+  "repeats_repaired_flaw": false,
+  "brief_rationale": "one sentence",
+  "confidence": "low|medium|high"
+}
+
+Definitions:
+- `targets_explicit_concession`: the main objection merely repeats a limitation
+  the argument already acknowledges without identifying a remaining problem.
+- `operational_substitution`: the main objection requests procedures, templates,
+  thresholds, workflows, or implementation detail instead of identifying a
+  conceptual weakness.
+- `repeats_repaired_flaw`: the critique asserts a conflict between actual
+  historical reasoning and retrospective justification even though the supplied
+  argument no longer makes the conflicting historical-fidelity claim.
+
+Question:
+{question}
+
+Argument:
+{argument}
+
+Candidate critique:
+{critique}

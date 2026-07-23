@@ -61,9 +61,9 @@ Ordering changes under equal weights: **False**
 ## 6. Response length & word-limit compliance
 
 Pearson correlation between response word count and recomputed item score: **0.102**  
-A large positive correlation would be a verbosity-confound warning; the 300-word cap keeps this small.
+A large positive correlation would be a verbosity-confound warning; the observed correlation is descriptive, not proof of style invariance.
 
-The 300-word cap is **recorded, not enforced** — responses are never truncated (truncation cuts reasoning mid-sentence and adds an artifact). Violation rate by model:
+The 300-word instruction is **recorded, not enforced** — responses are never truncated (truncation cuts reasoning mid-sentence and adds an artifact). Violation rate by model:
 
 | model | violation rate | violations / n | mean words | max words |
 |---|---:|---:|---:|---:|
@@ -72,7 +72,7 @@ The 300-word cap is **recorded, not enforced** — responses are never truncated
 | opus | 0.85 | 28/33 | 305 | 320 |
 | fable | 0.76 | 25/33 | 304 | 325 |
 
-The grader is instructed not to reward length, and the near-zero length–score correlation (0.102) supports that: the models that overshoot the cap most do not gain score from it, so the (small, ~10% max) cap violations are not confounding the results.
+The grader is instructed not to reward length. The modest length–score correlation (0.102) provides little evidence that verbosity alone drove scores in this sample, but it does not rule out nonlinear or stylistic effects. Overruns were frequent for some models but modest in magnitude (the maximum response was roughly 10% over the request).
 
 ## 7. Failures / invalid grader outputs
 

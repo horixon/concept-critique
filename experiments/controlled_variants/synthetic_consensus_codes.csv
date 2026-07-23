@@ -1,0 +1,15 @@
+source_id,model_alias,sample_number,primary_label,severity,targets_explicit_concession,operational_substitution,repeats_repaired_flaw,notes
+1000,fable,2,actual_reasoning_vs_reconstructed_justification,defeats,False,False,False,synthetic consensus: fable+sonnet
+1000,haiku,2,actual_reasoning_vs_reconstructed_justification,narrows,False,False,False,synthetic consensus: fable+sonnet
+1000,opus,0,actual_reasoning_vs_reconstructed_justification,narrows,False,False,False,synthetic consensus: fable+sonnet
+1000,opus,2,actual_reasoning_vs_reconstructed_justification,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,fable,0,coherence_not_truth,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,fable,1,coherence_not_truth,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,fable,2,coherence_not_truth,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,opus,0,purpose_relative_standard,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,sonnet,0,purpose_relative_standard,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,sonnet,1,purpose_relative_standard,narrows,False,False,False,synthetic consensus: fable+sonnet
+1001,sonnet,2,purpose_relative_standard,narrows,False,False,False,synthetic consensus: fable+sonnet
+1002,fable,1,evidence_underdetermines_reasoning,narrows,False,False,False,synthetic consensus: fable+sonnet
+1002,haiku,0,actual_reasoning_vs_reconstructed_justification,narrows,False,False,False,synthetic consensus: fable+sonnet
+1002,haiku,2,actual_reasoning_vs_reconstructed_justification,narrows,False,False,False,synthetic consensus: fable+sonnet

@@ -26,7 +26,7 @@ import analysis as A
 import eval as E
 import runner
 
-CAL_FILE = "q0_q2_rubric_calibration_labeled.jsonl"
+CAL_FILE = "data/calibration/q0_q2_rubric_calibration_labeled.jsonl"
 GRADES = "q0_q2_calibration_grades.jsonl"
 DIMS = E.DIMENSIONS
 PENS = E.PENALTIES
@@ -223,8 +223,9 @@ def report(records, out_md, out_json):
         "argument_specific_vs_laundry": {"pairs": len(cross), "grader_ranks_strong_higher": cross_ok,
                                          "human_ranks_strong_higher": cross_ok_h},
         "checks": checks,
-        "note_no_tuning": "The grader prompt was not modified during calibration; metrics are over all 18 "
-                          "records. No repeated tuning on the set occurred, so no holdout was required.",
+        "note_no_tuning": "The grader prompt was not modified during this v2 calibration run; metrics are over "
+                          "all 18 records. Because these examples helped motivate the rubric, this remains a "
+                          "rubric-implementation unit test rather than holdout evidence.",
     }
     with open(out_json, "w", encoding="utf-8") as fh:
         json.dump(metrics, fh, ensure_ascii=False, indent=2)
@@ -301,8 +302,9 @@ def _write_md(path, records, human, grades, ids, cat, qid, m):
              "is low (overclaim and mere_operationalization are frequently missed). It still recovers the broad "
              "ordering (Spearman/pairwise) and disposition. A likely contributor is that this calibration grades "
              "**annotation-free**, so the grader lacks the `non_novel_restatements` and `explicit_concessions` lists "
-             "that anchor novelty and the penalties in the full eval; the leniency here is a lower bound on how "
-             "strictly the grader behaves with those lists present. " + m["note_no_tuning"] + "\n")
+             "that anchor novelty and the penalties in the full eval. Those annotations may improve strictness, "
+             "but that direction was not tested with a paired annotated/annotation-free comparison. "
+             + m["note_no_tuning"] + "\n")
     open(path, "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 

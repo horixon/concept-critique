@@ -1,11 +1,11 @@
 # Art & Design — conceptual-critique exploration run
 
-A separate, exploratory set of six conceptual questions on art and design, each paired with a one-sided argument for the models to critique. It reuses the `runner.py` harness and the same critique framing as the main submission, but it is **not** part of that submission and has **no grader or gold labels** — this report is descriptive, not scored.
+A separate, exploratory set of six conceptual questions on art and design, each paired with a one-sided argument for the models to critique. It reuses the `runner.py` harness with item-specific templates stored in `experiments/art_design/exploration/items.jsonl`; unlike the graded eval, it does not use `prompts/candidates/critique_300w_v1.txt`. It is **not** part of the primary evaluation and has **no grader or gold labels** — this report is descriptive, not scored.
 
 ## Setup
 
-- Questions: `questions.art_design.jsonl` (6 items, incl. Duchamp's *Fountain* and AI-generated art)
-- Transcripts: `art_design_transcripts.jsonl` — 48 successful, 0 errored (of 48 deduped)
+- Questions: `experiments/art_design/exploration/items.jsonl` (6 items, incl. Duchamp's *Fountain* and AI-generated art)
+- Transcripts: `experiments/art_design/exploration/transcripts.jsonl` — 48 successful, 0 errored (of 48 deduped)
 - Models: Haiku 4.5, Sonnet 4.6, Opus 4.8, Fable 5
 - Run id(s): `20260721T191318Z-b097bf`, `20260721T191557Z-6825ac`
 - Distinct experiment fingerprints: 6 (prompt+system+config)
@@ -19,7 +19,7 @@ A separate, exploratory set of six conceptual questions on art and design, each 
 | Opus 4.8 | 12 | 532.5 | 452–592 | 1086.8 | end_turn×12 | 0 |
 | Fable 5 | 12 | 630.2 | 522–740 | 1557.1 | end_turn×12 | 0 |
 
-_No word limit is imposed in this run (unlike the main eval's 300-word cap), so word counts describe natural critique length, not compliance._
+_No word limit is imposed in this run (unlike the main eval's 300-word instruction), so word counts describe natural critique length, not compliance._
 
 ## Questions and critiques
 
@@ -107,9 +107,10 @@ _No word limit is imposed in this run (unlike the main eval's 300-word cap), so 
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-python3 runner.py -i questions.art_design.jsonl \
-  -o art_design_transcripts.jsonl -n 2 -m haiku sonnet opus fable \
-  -c 6 --max-tokens 4096 --manifest art_design_runs.jsonl
-python3 art_design_report.py   # regenerates this file
+python3 runner.py -i experiments/art_design/exploration/items.jsonl \
+  -o experiments/art_design/exploration/transcripts.jsonl -n 2 \
+  -m haiku sonnet opus fable -c 6 --max-tokens 4096 \
+  --manifest experiments/art_design/exploration/runs.jsonl
+python3 experiments/art_design/exploration/report.py
 ```
 

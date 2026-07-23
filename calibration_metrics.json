@@ -149,5 +149,5 @@
       "detail": "disposition should be narrows"
     }
   ],
-  "note_no_tuning": "The grader prompt was not modified during calibration; metrics are over all 18 records. No repeated tuning on the set occurred, so no holdout was required."
+  "note_no_tuning": "The grader prompt was not modified during this v2 calibration run; metrics are over all 18 records. Because these examples helped motivate the rubric, this remains a rubric-implementation unit test rather than holdout evidence."
 }

@@ -26,3 +26,6 @@ full gate table and anchor checks.
 `eval_v3.py` was written against the pre-reorg module layout (it imported the old
 `eval_v2.py`). To run it, check out the commit that introduced v3 (before the
 "Reorganize" commit); the top-level v2 pipeline in `eval.py` is the maintained one.
+In the current layout, shared evaluation items and calibration inputs live under
+`../../data/eval/` and `../../data/calibration/`. V3 changed the grader only; it
+did not create a separate candidate-generation prompt or main-eval transcript set.

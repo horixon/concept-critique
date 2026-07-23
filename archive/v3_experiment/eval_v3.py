@@ -399,8 +399,8 @@ def _calib_md(path, records, human, grades, ids, cat, qid, model, m):
     L.append("## Interpretation\n")
     verdict = ("All gates pass — the v3 grader is frozen and the main eval is regraded."
                if m["all_gates_pass"] else
-               "**Not all gates pass — per holdout discipline the prompt is frozen as-is, the limitation is reported "
-               "rather than tuned away, and the main eval is NOT regraded (gate in spec §9).**")
+               "**Not all gates pass — per the encoded promotion rule, the prompt is frozen as-is, the limitation "
+               "is reported rather than tuned away, and the main eval is NOT regraded.**")
     L.append(verdict + " This is a unit test of rubric implementation on the examples that shaped the rubric; it does "
              "not show the rubric generalizes. Recompute is authoritative; the grader never returns item_score. "
              "The novelty cap now keys on `acknowledged_only` (novelty ≤ 0.25) rather than the v2 blanket "
@@ -418,7 +418,7 @@ def _calib_md(path, records, human, grades, ids, cat, qid, model, m):
                  "≈0.13) also pulls pairwise ordering (0.748) and Spearman (0.680) just under their thresholds. "
                  "Root cause: annotation-free calibration withholds the `non_novel_restatements` / `explicit_concessions` "
                  "lists that anchor novelty; the main eval grades **with** those lists, so v3 would likely detect this "
-                 "case there — but the spec gates promotion on annotation-free calibration, which did not pass, so the "
+                 "case there — but promotion required the annotation-free calibration gates to pass, so the "
                  "main-eval regrade is deferred. No human labels were changed.\n")
     open(path, "w", encoding="utf-8").write("\n".join(L) + "\n")
 
@@ -577,8 +577,9 @@ def _summ_md(r, path):
     L.append("## Interpretation & limitations\n")
     L.append("v3 tightens novelty/operational/overclaim detection via a stricter prompt and consistency gates; the "
              "novelty cap keys on `acknowledged_only` so real mechanisms on acknowledged premises are not zeroed. "
-             "Recompute is authoritative. Same v1/v2 limitations hold: grader sees the annotation, single fixed grader, "
-             "small dataset with large item variance, and Haiku's 7/11 coverage. Monotonic ordering does not prove validity.\n")
+             "Recompute is authoritative. Same v1/v2 limitations hold: grader sees the annotation, there is one fixed "
+             "grader, and the small dataset has large item variance. All models now have complete coverage, but "
+             "monotonic ordering still does not prove validity.\n")
     open(path, "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 
@@ -587,7 +588,7 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
 
     cal = sub.add_parser("calibrate")
-    cal.add_argument("--input", default="q0_q2_rubric_calibration_labeled.jsonl")
+    cal.add_argument("--input", default="data/calibration/q0_q2_rubric_calibration_labeled.jsonl")
     cal.add_argument("--rubric", default="critique_eval_rubric_v2.md")
     cal.add_argument("--grader-prompt", default="critique_eval_grader_prompt_v3.txt")
     cal.add_argument("--grader", choices=sorted(E.MODELS), default="opus")
@@ -600,7 +601,7 @@ def main(argv=None):
 
     gr = sub.add_parser("grade")
     gr.add_argument("--transcripts", default="eval_transcripts.jsonl")
-    gr.add_argument("--items", default="critique_eval_annotated_items_v2.jsonl")
+    gr.add_argument("--items", default="data/eval/critique_eval_annotated_items_v2.jsonl")
     gr.add_argument("--rubric", default="critique_eval_rubric_v2.md")
     gr.add_argument("--grader-prompt", default="critique_eval_grader_prompt_v3.txt")
     gr.add_argument("--grader", choices=sorted(E.MODELS), default="opus")
@@ -611,7 +612,7 @@ def main(argv=None):
 
     s = sub.add_parser("summarize")
     s.add_argument("--transcripts", default="eval_transcripts.jsonl")
-    s.add_argument("--items", default="critique_eval_annotated_items_v2.jsonl")
+    s.add_argument("--items", default="data/eval/critique_eval_annotated_items_v2.jsonl")
     s.add_argument("--grades", default="eval_grades_v3.jsonl")
     s.add_argument("--previous-grades", default="eval_grades_v2.jsonl")
     s.add_argument("--json-output", default="eval_results_v3.json")

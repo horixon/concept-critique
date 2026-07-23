@@ -4,26 +4,22 @@ run.sh
 # Experiment output
 transcripts.jsonl
 *.jsonl
-!questions.example.jsonl
-!questions.jsonl
+!data/
+!data/exploration/
+!data/exploration/*.jsonl
+!data/eval/
+!data/eval/*.jsonl
+!data/calibration/
+!data/calibration/*.jsonl
+!experiments/
+!experiments/**/
+!experiments/**/*.jsonl
 # critique eval inputs + outputs are versioned deliverables
-!critique_eval_annotated_items.jsonl
 !eval_transcripts.jsonl
 !eval_grades.jsonl
 !eval_runs.jsonl
 # v2
-!critique_eval_annotation_overrides_v2.jsonl
-!critique_eval_annotated_items_v2.jsonl
 !eval_grades_v2.jsonl
-# art & design exploration set (separate branch, not the main submission)
-!questions.art_design.jsonl
-!art_design_transcripts.jsonl
-!art_design_runs.jsonl
-# art & design graded eval (parallel to the main pipeline)
-!critique_eval_annotated_items_art_design.jsonl
-!art_design_eval_transcripts.jsonl
-!art_design_eval_grades.jsonl
-
 # Python
 __pycache__/
 *.pyc
@@ -33,10 +29,15 @@ venv/
 # Generated evaluation PDFs
 *.pdf
 
+# Local interview-prep artifacts (never part of the project deliverable)
+INTERVIEW_PREP.md
+HARNESS_ENGINEERING_ONE_PAGER.md
+render_interview_prep.py
+render_harness_one_pager.py
+
 # macOS
 .DS_Store
 # calibration set inputs + outputs
-!q0_q2_rubric_calibration_labeled.jsonl
 !q0_q2_calibration_grades.jsonl
 !calibration_grades_v3.jsonl
 # test fixtures

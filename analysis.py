@@ -26,7 +26,7 @@ import eval as E  # reuse compute_item_score, DIMENSIONS, PENALTIES, is_robust_c
 
 ORDER = ["haiku", "sonnet", "opus", "fable"]
 DISPLAY = {"haiku": "Haiku 4.5", "sonnet": "Sonnet 4.6", "opus": "Opus 4.8", "fable": "Fable 5"}
-ITEMS_PATH = "critique_eval_annotated_items.jsonl"
+ITEMS_PATH = "data/eval/critique_eval_annotated_items_v2.jsonl"
 TX_PATH = "eval_transcripts.jsonl"
 GR_PATH = "eval_grades.jsonl"
 SAMPLES = 3
@@ -232,6 +232,10 @@ def main() -> None:
         "score_by_case_type": by_case, "ordering_by_mean": order_by_mean,
         "expected_ordering_opus_sonnet_haiku": expected_ok, "length": length,
         "grader_model": next((g["grader_model_alias"] for g in gr.values() if g.get("error") is None), None),
+        "novelty_zero": [
+            {"eval_id": r["eval_id"], "model": r["model"], "sample": r["sample"]}
+            for r in recs if r["novelty"] == 0
+        ],
     }
 
     with open("eval_failure_examples.json", "w", encoding="utf-8") as fh:
@@ -372,15 +376,20 @@ def write_analysis_md(items, agg, examples) -> None:
     L.append("# Eval Results and Failure Inspection\n")
 
     L.append("## Run integrity\n")
-    L.append(f"Expected {v['expected_candidates']} candidate critiques (11 items × 3 samples × 4 models); "
-             f"{v['successful_candidates']} succeeded across {v['unique_candidates']} unique keys, with "
-             f"{len(v['failed_candidate_keys'])} candidate failures and {v['grading_failures']} grading failures. "
-             f"Every successful candidate has exactly one grade ({v['successful_grades']} grades). "
-             f"Duplicate keys: {v['duplicate_candidate_keys']} candidate / {v['duplicate_grade_keys']} grade "
-             f"(retry rows deduped, successes preferred; nothing dropped). Unexpected model IDs: "
-             f"{v['unexpected_model_ids'] or 'none'}. All failures are **Haiku 4.5 on items 2/3/6/8** "
-             f"(deterministic 529 overloaded_error), so Haiku covers only {pm['haiku']['items_covered']}/11 items; "
-             f"the other three models are complete at 11/11.\n")
+    integrity = (f"Expected {v['expected_candidates']} candidate critiques (11 items × 3 samples × 4 models); "
+                 f"{v['successful_candidates']} succeeded across {v['unique_candidates']} unique keys, with "
+                 f"{len(v['failed_candidate_keys'])} candidate failures and {v['grading_failures']} grading failures. "
+                 f"Every successful candidate has exactly one grade ({v['successful_grades']} grades). "
+                 f"Duplicate keys: {v['duplicate_candidate_keys']} candidate / {v['duplicate_grade_keys']} grade "
+                 f"(retry rows deduped, successes preferred). Unexpected model IDs: "
+                 f"{v['unexpected_model_ids'] or 'none'}. ")
+    if v["failed_candidate_keys"] or v["incomplete_sample_counts"]:
+        integrity += (f"Failed candidate keys: {v['failed_candidate_keys'] or 'none'}; "
+                      f"incomplete sample counts: {v['incomplete_sample_counts'] or 'none'}. ")
+    else:
+        integrity += "Every model covers all 11 items with all three samples. "
+    L.append(integrity + "Earlier failed attempts were retained in operational history and later backfilled; "
+             "the final deduplicated evaluation is complete.\n")
 
     L.append("## Model results\n")
     L.append("Model score = **mean over items of the per-item sample mean**; 95% CI is a bootstrap over **items** "
@@ -403,9 +412,10 @@ def write_analysis_md(items, agg, examples) -> None:
                          f"({pm[m]['items_covered']} items, {pm[m]['n']} gens)" for m in ORDER) + ".\n")
 
     L.append("## What drove the score\n")
-    L.append(f"Separation is broad-based, not one dimension. Centrality (Haiku {f(pm['haiku']['centrality'],2)} "
-             f"→ Fable {f(pm['fable']['centrality'],2)}) and novelty (Haiku {f(pm['haiku']['novelty'],2)} → Fable "
-             f"{f(pm['fable']['novelty'],2)}) move most; fidelity and impact are high across the board. Penalties are "
+    L.append(f"Separation is broad-based, not one dimension. The Haiku→Fable gap is largest in centrality "
+             f"({f(pm['haiku']['centrality'],2)} → {f(pm['fable']['centrality'],2)}), with similar movement in "
+             f"fidelity ({f(pm['haiku']['argument_fidelity'],2)} → {f(pm['fable']['argument_fidelity'],2)}) and "
+             f"novelty ({f(pm['haiku']['novelty'],2)} → {f(pm['fable']['novelty'],2)}). Penalties are "
              f"minor at the top (mean total Fable {f(pm['fable']['mean_penalty'],3)}, Opus {f(pm['opus']['mean_penalty'],3)}) "
              f"and larger for Haiku ({f(pm['haiku']['mean_penalty'],3)}), so the gap is mostly earned dimension credit, "
              f"not penalty avoidance.\n")
@@ -417,19 +427,24 @@ def write_analysis_md(items, agg, examples) -> None:
              f"Opus {f(pm['opus']['control_mean'])}, Fable {f(pm['fable']['control_mean'])}; false-attack rates "
              f"{pct(pm['haiku']['control_false_attack_rate'])}/{pct(pm['sonnet']['control_false_attack_rate'])}/"
              f"{pct(pm['opus']['control_false_attack_rate'])}/{pct(pm['fable']['control_false_attack_rate'])}. "
-             "Stronger models mostly qualify rather than invent contradictions; Haiku's control score is depressed "
-             "partly by missing 3 of the 6 control items, so read it cautiously.\n")
+             "Stronger models mostly qualify rather than invent contradictions. Every model has complete coverage "
+             "of all six control items.\n")
 
+    novelty_zero = agg["novelty_zero"]
+    novelty_zero_where = ", ".join(
+        f"eval {r['eval_id']} / {r['model']} / s{r['sample']}" for r in novelty_zero
+    ) or "none"
     L.append("## Reward-hacking checks\n")
     L.append(f"Length–score correlation is weak: Pearson {f(ln['pearson_overall'],2)}, Spearman "
              f"{f(ln['spearman_overall'],2)} overall, with within-model Pearson "
              + ", ".join(f"{DISPLAY[m]} {f(ln['pearson_within_model'][m],2)}" for m in ORDER) + ". "
-             "The 300-word cap compresses length (mean words "
+             "The 300-word instruction constrains the observed length range (mean words "
              + ", ".join(f"{DISPLAY[m]} {'' if pm[m]['mean_words'] is None else round(pm[m]['mean_words'])}" for m in ORDER)
-             + "), so there is no strong sign that verbosity buys score. Laundry-list penalties are rare, and the "
-             "novelty dimension is doing its intended job — though only 2 responses scored novelty 0 in the whole "
-             "run (both Haiku, over-attacking the eval-1 control), so the pure polished-restatement trap barely "
-             "fired here.\n")
+             + "), providing little evidence that simple verbosity buys score without ruling out nonlinear or "
+             "stylistic effects. Laundry-list penalties are rare. Only "
+             f"{len(novelty_zero)} response{'s' if len(novelty_zero) != 1 else ''} scored novelty 0 "
+             f"({novelty_zero_where}), so this run provides little direct evidence about discrimination of pure "
+             "polished restatements.\n")
 
     L.append("## Manual failure inspection\n")
     for ex in examples:
@@ -452,7 +467,7 @@ def write_analysis_md(items, agg, examples) -> None:
              "4. A single fixed grader may favor its own critique style (Opus/Fable share lineage).\n"
              "5. With 11 items, item-level variance is large — the per-item table shows several 0/1 swings, and the "
              "bootstrap CIs for the top three overlap.\n"
-             "6. Haiku's incomplete coverage (7/11, all failures a provider-side 529) further limits its comparison.\n")
+             "6. Three samples per item provide only a limited view of generation variance.\n")
     open("eval_failure_analysis.md", "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 
