@@ -11,8 +11,10 @@ a rubric; the harness recomputes the score in code and aggregates.
 
 ## Findings
 
-Eval score = how well a model's critique matches a human-annotated central flaw
-under the v2 rubric, graded by Opus. Model score is the mean over items of the
+Eval score = how well a model's critique matches an AI-assisted reference judgment
+under the v2 rubric, graded by Opus. Some judgments began with author drafts, but
+AI tools substantially rewrote the structured annotations; they are not independent
+reference ground truth. Model score is the mean over items of the
 per-item sample mean; the interval is a 95% **item (cluster) bootstrap** — 11
 arguments × 3 samples × 4 models = 132 critiques.
 
@@ -25,7 +27,7 @@ arguments × 3 samples × 4 models = 132 critiques.
 
 The sanity check **Opus > Sonnet > Haiku holds**, and Fable ranks highest (reported,
 not assumed). Read this as suggestive, not validated: the top three CIs **overlap**,
-it's only 11 items with one fixed grader, and the grader sees the human annotation.
+it's only 11 items with one fixed grader, and the grader sees the reference annotation.
 The checks found little evidence that the ordering was explained by simple response
 length (word-count↔score correlation ≈ 0.10; the limit is recorded, not enforced),
 penalty avoidance, or unearned attacks on the six annotated controls. These checks
@@ -152,7 +154,7 @@ thinking/answer text) and `runner.py` (`extract_text`).
 
 ## Reading a response for evaluation (PDF)
 
-Render any single row to a human-readable PDF, keyed by the response message id
+Render any single row to a reference-readable PDF, keyed by the response message id
 (`msg_...`, i.e. `response.id`):
 
 ```bash
@@ -358,8 +360,8 @@ python3 tests/test_experiments.py
 
 ## Grader calibration
 
-`calibrate.py` runs the grader on 18 hand-labeled Q0–Q2 critiques (annotation-free)
-and compares to `human_label` — dimension agreement, penalty precision/recall,
+`calibrate.py` runs the grader on 18 reference-labeled Q0–Q2 critiques (annotation-free)
+and compares to `reference_label` — dimension agreement, penalty precision/recall,
 disposition accuracy, Spearman, pairwise ordering. It's a unit test of rubric
 *implementation*, not evidence the rubric generalizes.
 
@@ -375,6 +377,6 @@ and reproduction commands. See `experiments/README.md` for the shared contract.
   argument is flawed, repaired, or explicitly excludes operational objections.
 - `experiments/questions_1_8/` pairs eight robust arguments with eight minimally
   changed flawed counterparts and uses explicitly synthetic, pre-generation
-  references. Its results are a separate stress test, not human-ground-truth scores.
+  references. Its results are a separate stress test, not reference-ground-truth scores.
 
 Experiment scores must not be pooled with the 11-item main result.

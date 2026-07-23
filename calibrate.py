@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Grader calibration on the Q0-Q2 unit-test set (18 hand-labeled critiques).
+"""Grader calibration on the Q0-Q2 unit-test set (18 reference-labeled critiques).
 
-Runs the v2 grader on each labeled record (annotation-free — the human labeled
-these by judging the critique against the argument, so the grader gets the same
-inputs) and compares its output to `human_label`. This measures whether the
+Runs the v2 grader on each labeled record. The reference labels were assigned by
+judging each critique against its argument, while calibration grading is
+annotation-free, so the grader receives the same argument-and-critique inputs.
+Its output is compared to `reference_label`. This measures whether the
 grader IMPLEMENTS the v2 rubric; it does not show the rubric generalizes.
 
   python calibrate.py                 # grade missing records, then report
@@ -105,15 +106,15 @@ def _spearman(xs, ys):
 
 
 def report(records, out_md, out_json):
-    human = {r["calibration_id"]: r["human_label"] for r in records}
-    cat = {r["calibration_id"]: r["human_label"]["category"] for r in records}
+    reference = {r["calibration_id"]: r["reference_label"] for r in records}
+    cat = {r["calibration_id"]: r["reference_label"]["category"] for r in records}
     qid = {r["calibration_id"]: r["question_id"] for r in records}
     grades = {g["calibration_id"]: g for g in E.load_jsonl(GRADES) if g.get("error") is None}
-    ids = sorted(cid for cid in human if cid in grades)
-    missing = sorted(set(human) - set(grades))
+    ids = sorted(cid for cid in reference if cid in grades)
+    missing = sorted(set(reference) - set(grades))
 
     def h(cid, k):
-        return human[cid][k]
+        return reference[cid][k]
 
     def g(cid, k):
         return grades[cid][k]
@@ -153,7 +154,7 @@ def report(records, out_md, out_json):
     pears = E._pearson(hs, gs)
     score_mae = A.mean([abs(a - b) for a, b in zip(hs, gs)])
 
-    # pairwise ordering accuracy (all pairs where human scores differ)
+    # pairwise ordering accuracy (all pairs where reference scores differ)
     conc = disc = ties_g = 0
     for a, b in itertools.combinations(ids, 2):
         dh = float(h(a, "item_score")) - float(h(b, "item_score"))
@@ -176,13 +177,13 @@ def report(records, out_md, out_json):
     checks = []
 
     def add_check(name, member, cond, detail):
-        # cond(cid, getter) evaluated for both grader (g) and human (h) so a
-        # "failure" the human also makes (loose category name) isn't blamed on the grader.
+        # cond(cid, getter) evaluated for both grader (g) and reference (h) so a
+        # "failure" the reference also makes (loose category name) isn't blamed on the grader.
         members = [c for c in ids if member(c)]
         gpass = [c for c in members if cond(c, g)]
         hpass = [c for c in members if cond(c, h)]
         checks.append({"name": name, "n": len(members),
-                       "grader_passed": len(gpass), "human_passed": len(hpass), "members": members,
+                       "grader_passed": len(gpass), "reference_passed": len(hpass), "members": members,
                        "grader_failures": [c for c in members if not cond(c, g)], "detail": detail})
 
     add_check("Polished restatement -> novelty in {0, 0.25}",
@@ -221,7 +222,7 @@ def report(records, out_md, out_json):
         "pairwise_ordering_accuracy": pairwise,
         "pairwise_counts": {"concordant": conc, "discordant": disc, "grader_ties": ties_g},
         "argument_specific_vs_laundry": {"pairs": len(cross), "grader_ranks_strong_higher": cross_ok,
-                                         "human_ranks_strong_higher": cross_ok_h},
+                                         "reference_ranks_strong_higher": cross_ok_h},
         "checks": checks,
         "note_no_tuning": "The grader prompt was not modified during this v2 calibration run; metrics are over "
                           "all 18 records. Because these examples helped motivate the rubric, this remains a "
@@ -229,7 +230,7 @@ def report(records, out_md, out_json):
     }
     with open(out_json, "w", encoding="utf-8") as fh:
         json.dump(metrics, fh, ensure_ascii=False, indent=2)
-    _write_md(out_md, records, human, grades, ids, cat, qid, metrics)
+    _write_md(out_md, records, reference, grades, ids, cat, qid, metrics)
     print(f"wrote {out_md}, {out_json}", file=sys.stderr)
     print(f"dim within-0.25 macro={metrics['dimension_within_0.25_macro']:.2f} "
           f"disp_acc={disp_acc:.2f} spearman={spear:.2f} pairwise={pairwise:.2f}", file=sys.stderr)
@@ -239,14 +240,14 @@ def _f(x, nd=2):
     return "—" if x is None else f"{x:.{nd}f}"
 
 
-def _write_md(path, records, human, grades, ids, cat, qid, m):
+def _write_md(path, records, reference, grades, ids, cat, qid, m):
     L = ["# Grader Calibration — Q0–Q2 Rubric Unit-Test Set\n"]
     L.append(f"Grader: **{m['grader_model']}** · graded {m['n_graded']}/{m['n_records']} records"
              + (f" (missing {m['missing']})" if m["missing"] else "") +
-             ". Annotation-free grading (as the human labeled them). This checks that the grader "
+             ". Annotation-free grading (against the frozen reference labels). This checks that the grader "
              "**implements** the v2 rubric; per the set's README it does **not** show the rubric generalizes.\n")
 
-    L.append("## Dimension agreement (grader vs human)\n")
+    L.append("## Dimension agreement (grader vs reference)\n")
     L.append("| dimension | exact | within ±0.25 | MAE |\n|---|---:|---:|---:|")
     for d in DIMS:
         dm = m["dimension_agreement"][d]
@@ -270,22 +271,22 @@ def _write_md(path, records, human, grades, ids, cat, qid, m):
     asl = m["argument_specific_vs_laundry"]
     L.append(f"- **Argument-specific > laundry/generic:** grader ranks the stronger higher in "
              f"{asl['grader_ranks_strong_higher']}/{asl['pairs']} cross-pairs "
-             f"(human {asl['human_ranks_strong_higher']}/{asl['pairs']}).\n")
+             f"(reference {asl['reference_ranks_strong_higher']}/{asl['pairs']}).\n")
 
-    L.append("## Primary calibration checks (grader vs human baseline)\n")
-    L.append("Pass counts are out of the category members; the human baseline shows how many the hand labels "
-             "themselves satisfy (category names carry nuance), so grader ≈ human is the real target.\n")
+    L.append("## Primary calibration checks (grader vs reference baseline)\n")
+    L.append("Pass counts are out of the category members; the reference baseline shows how many the frozen labels "
+             "themselves satisfy (category names carry nuance), so grader ≈ reference is the target.\n")
     for c in m["checks"]:
-        status = "—" if c["n"] == 0 else ("✅" if c["grader_passed"] >= c["human_passed"] else "⚠️")
-        L.append(f"- {status} **{c['name']}** — grader {c['grader_passed']}/{c['n']}, human {c['human_passed']}/{c['n']}"
+        status = "—" if c["n"] == 0 else ("✅" if c["grader_passed"] >= c["reference_passed"] else "⚠️")
+        L.append(f"- {status} **{c['name']}** — grader {c['grader_passed']}/{c['n']}, reference {c['reference_passed']}/{c['n']}"
                  + (f"; grader misses cal_id {c['grader_failures']}" if c["grader_failures"] else "") + ".")
     L.append("")
 
-    L.append("## Per-record (human → grader)\n")
-    L.append("| cal | q | model | category | h.score | g.score | Δ | h.disp | g.disp |")
+    L.append("## Per-record (reference → grader)\n")
+    L.append("| cal | q | model | category | ref.score | g.score | Δ | ref.disp | g.disp |")
     L.append("|---|---|---|---|---:|---:|---:|---|---|")
     for c in ids:
-        hh, gg = human[c], grades[c]
+        hh, gg = reference[c], grades[c]
         L.append(f"| {c} | q{qid[c]} | {gg['model_alias']} | {cat[c][:34]} | "
                  f"{_f(hh['item_score'],3)} | {_f(gg['item_score'],3)} | "
                  f"{_f(gg['item_score']-hh['item_score'],2)} | {hh['disposition']} | {gg['disposition']} |")
@@ -297,7 +298,7 @@ def _write_md(path, records, human, grades, ids, cat, qid, m):
              "per-dimension agreement is expected to be modest (the 5-point scale invites ±0.25 disagreements); "
              "the more meaningful signals are within-±0.25 agreement, disposition accuracy, penalty recall on the "
              "targeted failure modes, and the pairwise ordering.\n")
-    L.append("**Main gap: the grader is more lenient than the human**, especially on the weak critiques. Per-record "
+    L.append("**Main gap: the grader is more lenient than the reference labels**, especially on the weak critiques. Per-record "
              "deltas are positive on the polished-restatement / operational / generic categories, and penalty recall "
              "is low (overclaim and mere_operationalization are frequently missed). It still recovers the broad "
              "ordering (Spearman/pairwise) and disposition. A likely contributor is that this calibration grades "

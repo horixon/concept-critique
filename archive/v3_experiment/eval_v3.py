@@ -222,14 +222,14 @@ def cmd_calibrate(args):
 
 
 def calibration_report(records, grades_path, md_path, json_path):
-    human = {r["calibration_id"]: r["human_label"] for r in records}
-    cat = {r["calibration_id"]: r["human_label"]["category"] for r in records}
+    reference = {r["calibration_id"]: r["reference_label"] for r in records}
+    cat = {r["calibration_id"]: r["reference_label"]["category"] for r in records}
     qid = {r["calibration_id"]: r["question_id"] for r in records}
     model = {r["calibration_id"]: r["model_alias"] for r in records}
     grades = {g["calibration_id"]: g for g in E.load_jsonl(grades_path) if g.get("error") is None}
-    ids = sorted(c for c in human if c in grades)
+    ids = sorted(c for c in reference if c in grades)
 
-    def h(c, k): return human[c][k]
+    def h(c, k): return reference[c][k]
     def g(c, k): return grades[c][k]
 
     dim = {}
@@ -342,7 +342,7 @@ def calibration_report(records, grades_path, md_path, json_path):
     }
     with open(json_path, "w", encoding="utf-8") as fh:
         json.dump(metrics, fh, ensure_ascii=False, indent=2)
-    _calib_md(md_path, records, human, grades, ids, cat, qid, model, metrics)
+    _calib_md(md_path, records, reference, grades, ids, cat, qid, model, metrics)
     print(f"\nGATES: {'ALL PASS' if all_pass else 'NOT ALL PASS'}", file=sys.stderr)
     for k, v in gates.items():
         print(f"  [{'PASS' if v[1] else 'FAIL'}] {k}: {v[0]}", file=sys.stderr)
@@ -352,9 +352,9 @@ def calibration_report(records, grades_path, md_path, json_path):
 def _f(x, nd=2): return "—" if x is None else (f"{x:.{nd}f}" if isinstance(x, (int, float)) else str(x))
 
 
-def _calib_md(path, records, human, grades, ids, cat, qid, model, m):
+def _calib_md(path, records, reference, grades, ids, cat, qid, model, m):
     L = ["# Grader Calibration v3 — Q0–Q2 Unit-Test Set\n"]
-    L.append(f"Grader: **{m['grader_model']}** · graded {m['n_graded']}/18 · annotation-free (human_label never shown to the grader).\n")
+    L.append(f"Grader: **{m['grader_model']}** · graded {m['n_graded']}/18 · annotation-free (`reference_label` was never shown to the grader).\n")
 
     L.append(f"## Success gates — **{'ALL PASS ✅' if m['all_gates_pass'] else 'NOT ALL PASS ⚠️'}**\n")
     L.append("| gate | value | pass |\n|---|---:|:--:|")
@@ -362,7 +362,7 @@ def _calib_md(path, records, human, grades, ids, cat, qid, model, m):
         L.append(f"| {k} | {_f(v['value'])} | {'✅' if v['pass'] else '❌'} |")
     L.append("")
 
-    L.append("## Anchor examples (manual verification)\n")
+    L.append("## Anchor examples (reference checks)\n")
     L.append("| anchor | cal_id | value | pass |\n|---|---|---:|:--:|")
     for k, v in m["anchors"].items():
         L.append(f"| {k} | {v['cal']} | {_f(v['score'])} | {'✅' if v['pass'] else '❌'} |")
@@ -384,11 +384,11 @@ def _calib_md(path, records, human, grades, ids, cat, qid, model, m):
     L.append(f"- Pairwise ordering {_f(m['pairwise_ordering_accuracy'])} (conc {pc['concordant']}, disc {pc['discordant']}, ties {pc['ties']}). "
              f"Argument-specific > weak in {m['argument_specific_over_weak']['ok']}/{m['argument_specific_over_weak']['pairs']} pairs.\n")
 
-    L.append("## Per-record (human → grader)\n")
-    L.append("| cal | q | model | category | h.score | g.score | Δ | h.disp | g.disp | h.nov | g.nov | h.pen | g.pen |")
+    L.append("## Per-record (reference → grader)\n")
+    L.append("| cal | q | model | category | ref.score | g.score | Δ | ref.disp | g.disp | ref.nov | g.nov | ref.pen | g.pen |")
     L.append("|---|---|---|---|---:|---:|---:|---|---|---:|---:|---|---|")
     for c in ids:
-        hh, gg = human[c], grades[c]
+        hh, gg = reference[c], grades[c]
         hp = "".join(k[0] for k, v in hh["penalties"].items() if v) or "-"
         gp = "".join(k[0] for k, v in gg["penalties"].items() if v) or "-"
         L.append(f"| {c} | q{qid[c]} | {model[c]} | {cat[c][:26]} | {_f(hh['item_score'],3)} | {_f(gg['item_score'],3)} | "
@@ -409,17 +409,17 @@ def _calib_md(path, records, human, grades, ids, cat, qid, model, m):
     if not m["all_gates_pass"]:
         L.append("**What v3 fixed and what it didn't.** v3 clearly improved the operational-substitution gate "
                  f"(recall {_f(m['mere_operationalization_recall'])}, up from 0.50 in v2) and holds overclaim recall "
-                 f"({_f(m['overclaim_recall'])}); 4 of 5 manual anchors pass (verification and strong critiques stay "
+                 f"({_f(m['overclaim_recall'])}); 4 of 5 labeled anchors pass (verification and strong critiques stay "
                  "high; the unfalsifiable example gets overclaim; the threshold example gets operationalization). "
-                 "The single behavioral miss is **polished restatement**: the pure case (cal 4, q0/fable — human "
+                 "The single behavioral miss is **polished restatement**: the pure case (cal 4, q0/fable — reference "
                  "novelty 0) was scored novelty 0.75 because, grading **annotation-free**, the grader read the "
                  "critique's high-stakes counterexample and selection-effect mechanism as new reasoning even though "
-                 "the argument had already conceded the underlying point. That one outlier (grader ≈0.79 vs human "
+                 "the argument had already conceded the underlying point. That one outlier (grader ≈0.79 vs reference "
                  "≈0.13) also pulls pairwise ordering (0.748) and Spearman (0.680) just under their thresholds. "
                  "Root cause: annotation-free calibration withholds the `non_novel_restatements` / `explicit_concessions` "
                  "lists that anchor novelty; the main eval grades **with** those lists, so v3 would likely detect this "
                  "case there — but promotion required the annotation-free calibration gates to pass, so the "
-                 "main-eval regrade is deferred. No human labels were changed.\n")
+                 "main-eval regrade is deferred. No reference labels were changed.\n")
     open(path, "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 

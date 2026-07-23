@@ -27,12 +27,13 @@ Use `eval.py generate` when comparing studies under the same candidate prompt.
 Use `runner.py` only when prompt variation is itself part of an explicitly
 ungraded exploration. A JSONL file with only questions and arguments is enough
 for generation, but `eval.py grade` additionally requires frozen reference
-annotations. Human references are preferred. If a follow-on uses synthetic
+annotations. Independently reviewed human references are preferred. If a follow-on uses synthetic
 references, they must be generated before candidate responses, role-separated,
 versioned, and labeled synthetic in every report. Never infer references from the
 candidate answers being graded.
 
 Every experiment README should say whether it is (a) ungraded exploration,
-(b) human-annotated, or (c) synthetic-annotated. Commit inputs and code before
+(b) independently human-annotated, (c) AI-assisted and author-reviewed, or
+(d) synthetic-annotated. Commit inputs and code before
 paid API runs when provenance matters; the harness will still record hashes and
 a dirty working-tree flag.
