@@ -36,9 +36,9 @@ There is a single robust-control item (eval_id [4], `aura-reproduction`): a deli
 
 ## Interpretation & limitations
 
-- Measures how well a short critique matches a human-annotated central flaw under the v2 rubric, as judged by one fixed Opus grader — not conceptual reasoning in general. Treat as suggestive.
+- Measures how well a short critique matches an AI-assisted reference annotation under the v2 rubric, as judged by one fixed Opus grader — not conceptual reasoning in general. Treat as suggestive.
 - **Only 6 items (1 control).** Item-level variance is large and the bootstrap CIs are wide and likely overlapping; do not over-read small mean gaps. The primary evaluation (11 items, 6 controls) is the better-powered version.
-- The grader sees the human annotation and may reward overlap with it; stronger models may raise valid critiques outside the annotated issue that the grader under-credits.
-- Robust-control validity depends on the human judgment that the `aura` argument has no fatal flaw.
+- The grader sees the reference annotation and may reward overlap with it; stronger models may raise valid critiques outside the annotated issue that the grader under-credits.
+- Robust-control validity depends on the AI-assisted reference judgment that the `aura` argument has no fatal flaw.
 - A single fixed grader may favor its own critique style (Opus/Fable share lineage).
 

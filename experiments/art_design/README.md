@@ -38,4 +38,5 @@ python3 experiments/art_design/eval/report.py
 ```
 
 The set is small (six items and one robust control), so its intervals and
-false-attack estimate are directional. Do not pool it with the main evaluation.
+false-attack estimate are directional. Its structured labels are AI-assisted
+references, not independent human ground truth. Do not pool it with the main evaluation.

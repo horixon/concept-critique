@@ -1,6 +1,6 @@
 # Grader Calibration v3 — Q0–Q2 Unit-Test Set
 
-Grader: **opus** · graded 18/18 · annotation-free (human_label never shown to the grader).
+Grader: **opus** · graded 18/18 · annotation-free (`reference_label` was never shown to the grader).
 
 ## Success gates — **NOT ALL PASS ⚠️**
 
@@ -14,7 +14,7 @@ Grader: **opus** · graded 18/18 · annotation-free (human_label never shown to 
 | overclaim_recall>=2/3 | 0.67 | ✅ |
 | argument_fidelity_within_0.25>=0.90 | 1.00 | ✅ |
 
-## Anchor examples (manual verification)
+## Anchor examples (reference checks)
 
 | anchor | cal_id | value | pass |
 |---|---|---:|:--:|
@@ -40,9 +40,9 @@ Grader: **opus** · graded 18/18 · annotation-free (human_label never shown to 
 - Disposition accuracy 0.83. Item-score Spearman 0.68, Pearson 0.65, MAE 0.212.
 - Pairwise ordering 0.75 (conc 103, disc 32, ties 8). Argument-specific > weak in 14/20 pairs.
 
-## Per-record (human → grader)
+## Per-record (reference → grader)
 
-| cal | q | model | category | h.score | g.score | Δ | h.disp | g.disp | h.nov | g.nov | h.pen | g.pen |
+| cal | q | model | category | ref.score | g.score | Δ | ref.disp | g.disp | ref.nov | g.nov | ref.pen | g.pen |
 |---|---|---|---|---:|---:|---:|---|---|---:|---:|---|---|
 | 0 | q0 | haiku | operational_substitution_a | 0.013 | 0.200 | 0.19 | narro | narro | 0.00 | 0.25 | lom | lom |
 | 1 | q0 | sonnet | valid_but_mostly_expected_ | 0.463 | 0.300 | -0.16 | narro | narro | 0.50 | 0.50 | l | lo |
@@ -69,4 +69,4 @@ Grader: **opus** · graded 18/18 · annotation-free (human_label never shown to 
 
 **Not all gates pass — per the encoded promotion rule, the prompt is frozen as-is, the limitation is reported rather than tuned away, and the main eval is NOT regraded.** This is a unit test of rubric implementation on the examples that shaped the rubric; it does not show the rubric generalizes. Recompute is authoritative; the grader never returns item_score. The novelty cap now keys on `acknowledged_only` (novelty ≤ 0.25) rather than the v2 blanket already-acknowledged → 0, so a critique that builds a real mechanism on an acknowledged premise can still earn novelty.
 
-**What v3 fixed and what it didn't.** v3 clearly improved the operational-substitution gate (recall 0.80, up from 0.50 in v2) and holds overclaim recall (0.67); 4 of 5 manual anchors pass (verification and strong critiques stay high; the unfalsifiable example gets overclaim; the threshold example gets operationalization). The single behavioral miss is **polished restatement**: the pure case (cal 4, q0/fable — human novelty 0) was scored novelty 0.75 because, grading **annotation-free**, the grader read the critique's high-stakes counterexample and selection-effect mechanism as new reasoning even though the argument had already conceded the underlying point. That one outlier (grader ≈0.79 vs human ≈0.13) also pulls pairwise ordering (0.748) and Spearman (0.680) just under their thresholds. Root cause: annotation-free calibration withholds the `non_novel_restatements` / `explicit_concessions` lists that anchor novelty; the main eval grades **with** those lists, so v3 would likely detect this case there — but promotion required the annotation-free calibration gates to pass, so the main-eval regrade is deferred. No human labels were changed.
+**What v3 fixed and what it didn't.** v3 clearly improved the operational-substitution gate (recall 0.80, up from 0.50 in v2) and holds overclaim recall (0.67); 4 of 5 labeled anchors pass (verification and strong critiques stay high; the unfalsifiable example gets overclaim; the threshold example gets operationalization). The single behavioral miss is **polished restatement**: the pure case (cal 4, q0/fable — reference novelty 0) was scored novelty 0.75 because, grading **annotation-free**, the grader read the critique's high-stakes counterexample and selection-effect mechanism as new reasoning even though the argument had already conceded the underlying point. That one outlier (grader ≈0.79 vs reference ≈0.13) also pulls pairwise ordering (0.748) and Spearman (0.680) just under their thresholds. Root cause: annotation-free calibration withholds the `non_novel_restatements` / `explicit_concessions` lists that anchor novelty; the main eval grades **with** those lists, so v3 would likely detect this case there — but promotion required the annotation-free calibration gates to pass, so the main-eval regrade is deferred. No reference labels were changed.

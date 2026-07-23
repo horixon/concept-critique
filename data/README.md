@@ -20,6 +20,14 @@ The `eval.py merge` command deterministically constructs the v2 items by copying
 the base items and overlaying only the named annotation fields from the v2
 overrides. Questions and arguments are preserved unchanged.
 
+The primary labels are AI-assisted reference annotations. Some judgments and
+drafts originated with the author, while AI tools substantially rewrote and
+expanded the final structured annotations. They are not independent human ground
+truth; see `../EVALUATION_SCOPE.md` for the validity boundary.
+
+The calibration file follows the same terminology: `reference_label` and
+`reference_rationale` identify frozen comparison targets, not provenance claims.
+
 Files use JSON objects as records. The evaluation and calibration files are
 strict one-object-per-line JSONL. The exploratory runner additionally accepts
 pretty-printed, multi-line JSON objects for easier hand authoring.

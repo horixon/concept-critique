@@ -173,14 +173,14 @@ def write_md(items, control_ids, flaw_ids, per_model, by_item, order_by_mean, ex
     L.append("")
 
     L.append("## Interpretation & limitations\n")
-    L.append("- Measures how well a short critique matches a human-annotated central flaw under the v2 rubric, as "
+    L.append("- Measures how well a short critique matches an AI-assisted reference annotation under the v2 rubric, as "
              "judged by one fixed Opus grader — not conceptual reasoning in general. Treat as suggestive.\n"
              "- **Only 6 items (1 control).** Item-level variance is large and the bootstrap CIs are wide and likely "
              "overlapping; do not over-read small mean gaps. The primary evaluation (11 items, 6 controls) is the "
              "better-powered version.\n"
-             "- The grader sees the human annotation and may reward overlap with it; stronger models may raise valid "
+             "- The grader sees the reference annotation and may reward overlap with it; stronger models may raise valid "
              "critiques outside the annotated issue that the grader under-credits.\n"
-             "- Robust-control validity depends on the human judgment that the `aura` argument has no fatal flaw.\n"
+             "- Robust-control validity depends on the AI-assisted reference judgment that the `aura` argument has no fatal flaw.\n"
              "- A single fixed grader may favor its own critique style (Opus/Fable share lineage).\n")
     with open(f"{BASE}/analysis.md", "w", encoding="utf-8") as fh:
         fh.write("\n".join(L) + "\n")

@@ -84,14 +84,14 @@
   "argument_specific_vs_laundry": {
     "pairs": 20,
     "grader_ranks_strong_higher": 12,
-    "human_ranks_strong_higher": 19
+    "reference_ranks_strong_higher": 19
   },
   "checks": [
     {
       "name": "Polished restatement -> novelty in {0, 0.25}",
       "n": 2,
       "grader_passed": 0,
-      "human_passed": 1,
+      "reference_passed": 1,
       "members": [
         2,
         4
@@ -106,7 +106,7 @@
       "name": "Operational substitution -> mere_operationalization penalty",
       "n": 5,
       "grader_passed": 2,
-      "human_passed": 4,
+      "reference_passed": 4,
       "members": [
         0,
         10,
@@ -125,7 +125,7 @@
       "name": "Overclaiming -> overclaim penalty",
       "n": 3,
       "grader_passed": 1,
-      "human_passed": 2,
+      "reference_passed": 2,
       "members": [
         0,
         9,
@@ -141,7 +141,7 @@
       "name": "Scope correction -> disposition 'narrows' (not 'defeats')",
       "n": 1,
       "grader_passed": 1,
-      "human_passed": 1,
+      "reference_passed": 1,
       "members": [
         8
       ],

@@ -1,8 +1,8 @@
 # Grader Calibration — Q0–Q2 Rubric Unit-Test Set
 
-Grader: **opus** · graded 18/18 records. Annotation-free grading (as the human labeled them). This checks that the grader **implements** the v2 rubric; per the set's README it does **not** show the rubric generalizes.
+Grader: **opus** · graded 18/18 records. Annotation-free grading (against the frozen reference labels). This checks that the grader **implements** the v2 rubric; per the set's README it does **not** show the rubric generalizes.
 
-## Dimension agreement (grader vs human)
+## Dimension agreement (grader vs reference)
 
 | dimension | exact | within ±0.25 | MAE |
 |---|---:|---:|---:|
@@ -19,20 +19,20 @@ Grader: **opus** · graded 18/18 records. Annotation-free grading (as the human 
 - **Disposition accuracy:** 0.83.
 - **Item-score:** Spearman 0.74, Pearson 0.70, MAE 0.219.
 - **Pairwise ordering accuracy:** 0.79 (concordant 108, discordant 26, grader-ties 9).
-- **Argument-specific > laundry/generic:** grader ranks the stronger higher in 12/20 cross-pairs (human 19/20).
+- **Argument-specific > laundry/generic:** grader ranks the stronger higher in 12/20 cross-pairs (reference 19/20).
 
-## Primary calibration checks (grader vs human baseline)
+## Primary calibration checks (grader vs reference baseline)
 
-Pass counts are out of the category members; the human baseline shows how many the hand labels themselves satisfy (category names carry nuance), so grader ≈ human is the real target.
+Pass counts are out of the category members; the reference baseline shows how many the frozen labels themselves satisfy (category names carry nuance), so grader ≈ reference is the target.
 
-- ⚠️ **Polished restatement -> novelty in {0, 0.25}** — grader 0/2, human 1/2; grader misses cal_id [2, 4].
-- ⚠️ **Operational substitution -> mere_operationalization penalty** — grader 2/5, human 4/5; grader misses cal_id [0, 10, 13].
-- ⚠️ **Overclaiming -> overclaim penalty** — grader 1/3, human 2/3; grader misses cal_id [0, 17].
-- ✅ **Scope correction -> disposition 'narrows' (not 'defeats')** — grader 1/1, human 1/1.
+- ⚠️ **Polished restatement -> novelty in {0, 0.25}** — grader 0/2, reference 1/2; grader misses cal_id [2, 4].
+- ⚠️ **Operational substitution -> mere_operationalization penalty** — grader 2/5, reference 4/5; grader misses cal_id [0, 10, 13].
+- ⚠️ **Overclaiming -> overclaim penalty** — grader 1/3, reference 2/3; grader misses cal_id [0, 17].
+- ✅ **Scope correction -> disposition 'narrows' (not 'defeats')** — grader 1/1, reference 1/1.
 
-## Per-record (human → grader)
+## Per-record (reference → grader)
 
-| cal | q | model | category | h.score | g.score | Δ | h.disp | g.disp |
+| cal | q | model | category | ref.score | g.score | Δ | ref.disp | g.disp |
 |---|---|---|---|---:|---:|---:|---|---|
 | 0 | q0 | haiku | operational_substitution_and_overc | 0.013 | 0.300 | 0.29 | narrows | narrows |
 | 1 | q0 | sonnet | valid_but_mostly_expected_sampling | 0.463 | 0.300 | -0.16 | narrows | narrows |
@@ -57,5 +57,5 @@ Pass counts are out of the category members; the human baseline shows how many t
 
 Agreement here shows the grader reproduces the rubric's intended behavior on the examples that motivated it — a unit test, not evidence the rubric generalizes to unseen arguments. Exact per-dimension agreement is expected to be modest (the 5-point scale invites ±0.25 disagreements); the more meaningful signals are within-±0.25 agreement, disposition accuracy, penalty recall on the targeted failure modes, and the pairwise ordering.
 
-**Main gap: the grader is more lenient than the human**, especially on the weak critiques. Per-record deltas are positive on the polished-restatement / operational / generic categories, and penalty recall is low (overclaim and mere_operationalization are frequently missed). It still recovers the broad ordering (Spearman/pairwise) and disposition. A likely contributor is that this calibration grades **annotation-free**, so the grader lacks the `non_novel_restatements` and `explicit_concessions` lists that anchor novelty and the penalties in the full eval. Those annotations may improve strictness, but that direction was not tested with a paired annotated/annotation-free comparison. The grader prompt was not modified during this v2 calibration run; metrics are over all 18 records. Because these examples helped motivate the rubric, this remains a rubric-implementation unit test rather than holdout evidence.
+**Main gap: the grader is more lenient than the reference labels**, especially on the weak critiques. Per-record deltas are positive on the polished-restatement / operational / generic categories, and penalty recall is low (overclaim and mere_operationalization are frequently missed). It still recovers the broad ordering (Spearman/pairwise) and disposition. A likely contributor is that this calibration grades **annotation-free**, so the grader lacks the `non_novel_restatements` and `explicit_concessions` lists that anchor novelty and the penalties in the full eval. Those annotations may improve strictness, but that direction was not tested with a paired annotated/annotation-free comparison. The grader prompt was not modified during this v2 calibration run; metrics are over all 18 records. Because these examples helped motivate the rubric, this remains a rubric-implementation unit test rather than holdout evidence.
 

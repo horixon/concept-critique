@@ -455,15 +455,15 @@ def write_analysis_md(items, agg, examples) -> None:
     L.append("\nFull excerpts, dimensions, and rationales are in `eval_failure_examples.json`.\n")
 
     L.append("## Interpretation\n")
-    L.append("The eval measures how well a model's short critique matches a human-annotated central flaw under a "
+    L.append("The eval measures how well a model's short critique matches an AI-assisted reference judgment under a "
              "rubric, as judged by one fixed Opus grader — not conceptual reasoning in general. The monotonic "
              "Opus>Sonnet>Haiku result and Fable's lead are consistent with capability but do **not** prove the eval "
              "valid; nor would a non-monotonic result prove the models misordered. Treat results as suggestive only.\n")
     L.append("**Limitations.**\n"
-             "1. The grader sees the human annotation and may reward overlap with it.\n"
+             "1. The grader sees the reference annotation and may reward overlap with it.\n"
              "2. Stronger models may raise valid critiques outside the annotated central issue that the grader "
              "under-credits.\n"
-             "3. Robust controls depend on the human judgment that no fatal flaw exists being correct.\n"
+             "3. Robust controls depend on the AI-assisted reference judgment that no fatal flaw exists being correct.\n"
              "4. A single fixed grader may favor its own critique style (Opus/Fable share lineage).\n"
              "5. With 11 items, item-level variance is large — the per-item table shows several 0/1 swings, and the "
              "bootstrap CIs for the top three overlap.\n"
